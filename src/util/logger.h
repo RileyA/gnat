@@ -12,14 +12,13 @@ class Logger : public EventHandler {
   Logger();
   virtual ~Logger();
 
-  void log();
-  void log(int level);
+  void log(String message, int level = 0);
 
  private:
   
-}
+};
 
-}
+}  // namespace gnat
 
 #endif
 

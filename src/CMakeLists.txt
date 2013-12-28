@@ -1,0 +1,24 @@
+set(GNAT_FILES
+  gnat.h
+  event/event_handler.h
+  event/message.h
+  event/observable.cc
+  event/observable.h
+  event/observer.cc
+  event/observer.h
+  event/signal.cc
+  event/signal.h
+  event/slot.cc
+  event/slot.h
+  third_party/FastDelegate/FastDelegate.h
+  util/logger.cc
+  util/logger.h
+	)
+
+add_library(gnat SHARED ${GNAT_FILES} )
+set_target_properties(gnat PROPERTIES LINKER_LANGUAGE CXX)
+
+install(TARGETS gnat
+	RUNTIME DESTINATION ${INSTALL_RUNTIMES_TO}
+	LIBRARY DESTINATION ${INSTALL_LIBS_TO}
+	ARCHIVE DESTINATION ${INSTALL_LIBS_TO})

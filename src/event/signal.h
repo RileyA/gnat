@@ -1,13 +1,15 @@
 #ifndef gnat_event_signal_H
 #define gnat_event_signal_H
 
+#include "gnat.h"
+#include "message.h"
+
 namespace gnat {
 
-class Message;
 class Slot;
 
 /** A Qt-inspired Signal, maintains a list of listeners (Slots)
- *    and calls their delegates when fired */
+ *    and calls their delegates when fired. */
 class Signal {
  public:
 
@@ -40,9 +42,9 @@ class Signal {
   void RemoveAllListeners();
 
 private:
-  list<Slot*> listeners_;
+  List<Slot*> listeners_;
 };
-} // mamespace gnat
+} // namespace gnat
 
 #endif
 

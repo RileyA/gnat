@@ -9,12 +9,14 @@
 namespace gnat {
 
 // Some common typedefs
-typedef std::map Map;
-typedef std::vector Vector;
 typedef std::string String;
-typedef std::list List;
 
-}
+// TODO: enable C++11 and use template aliases
+template<typename T> class Vector : public std::vector<T> {};
+template<typename T> class List : public std::list<T> {};
+template<typename K, typename V> class Map : public std::map<K,V> {};
+
+}  // namespace gnat
 
 #endif
 
