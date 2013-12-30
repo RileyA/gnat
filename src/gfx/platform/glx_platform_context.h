@@ -1,6 +1,8 @@
-#define gnat_gfx_glx_platform_context_H
+#ifndef gnat_gfx_glx_platform_context_H
 #define gnat_gfx_glx_platform_context_H
 
+#include "event/event_handler.h"
+#include "event/signal.h"
 #include "gfx/gl_platform_context.h"
 
 #include <X11/X.h>
@@ -17,11 +19,11 @@ class GLXPlatformContext : public GLPlatformContext {
   GLXPlatformContext();
   ~GLXPlatformContext();
 
-  virtual void init(size_t h, size_t w, bool fullscreen);
-  virtual void deinit();
-  virtual void update();
-  virtual void swapBuffers();
-  virtual long getWindowHandle();
+  virtual void Init(size_t h, size_t w, bool fullscreen);
+  virtual void Deinit();
+  virtual void Update();
+  virtual void SwapBuffers();
+  virtual long GetWindowHandle();
 
  private:
 

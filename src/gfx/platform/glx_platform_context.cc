@@ -6,17 +6,17 @@ GLXPlatformContext::GLXPlatformContext() {
   initialized_ = false;
   display_ = 0;
   visual_ = 0;
-  createSignal("WindowResized");
-  createSignal("WindowClosed");
+  CreateSignal("WindowResized");
+  CreateSignal("WindowClosed");
 }
 //-----------------------------------------------------------------------
 
 GLXPlatformContext::~GLXPlatformContext() {
-  deinit();
+  Deinit();
 }
 //-----------------------------------------------------------------------
 
-void GLXPlatformContext::init(size_t w, size_t h, bool fullscreen) {
+void GLXPlatformContext::Init(size_t w, size_t h, bool fullscreen) {
   if(!initialized_) {
     // open local display
     display_ = XOpenDisplay(0);
@@ -56,7 +56,7 @@ void GLXPlatformContext::init(size_t w, size_t h, bool fullscreen) {
 }
 //-----------------------------------------------------------------------
 
-void GLXPlatformContext::deinit() {
+void GLXPlatformContext::Deinit() {
   if(initialized_) {
     glXMakeCurrent(display_, None, 0);
     glXDestroyContext(display_, context_);
@@ -67,7 +67,7 @@ void GLXPlatformContext::deinit() {
 }
 //-----------------------------------------------------------------------
 
-void GLXPlatformContext::update() {
+void GLXPlatformContext::Update() {
   XEvent xev;
 
   while(XCheckMaskEvent(display_, StructureNotifyMask, &xev)) {
@@ -78,7 +78,7 @@ void GLXPlatformContext::update() {
           width_ = xev.xconfigure.width;
           height_ = xev.xconfigure.height;
           std::pair<size_t, size_t> report = std::make_pair(width_, height_);
-          getSignal("WindowResized")->send(report);
+          GetSignal("WindowResized")->Send(report);
         }
 
         break;
@@ -86,7 +86,7 @@ void GLXPlatformContext::update() {
       case ClientMessage:
 
         if(xev.xclient.data.l[0] == delete_message_) {
-          getSignal("WindowClosed")->send(xev.xclient.data.l[0]);
+          GetSignal("WindowClosed")->Send(xev.xclient.data.l[0]);
         }
 
         break;
@@ -95,12 +95,12 @@ void GLXPlatformContext::update() {
 }
 //-----------------------------------------------------------------------
 
-void GLXPlatformContext::swapBuffers() {
+void GLXPlatformContext::SwapBuffers() {
   glXSwapBuffers(display_, window_); 
 }
 //-----------------------------------------------------------------------
 
-long GLXPlatformContext::getWindowHandle() {
+long GLXPlatformContext::GetWindowHandle() {
   return window_;
 }
 //-----------------------------------------------------------------------

@@ -10,6 +10,9 @@ set(GNAT_FILES
   event/signal.h
   event/slot.cc
   event/slot.h
+  gfx/gl_platform_context.h
+  gfx/platform/glx_platform_context.cc
+  event/slot.h
   third_party/FastDelegate/FastDelegate.h
   util/logger.cc
   util/logger.h
