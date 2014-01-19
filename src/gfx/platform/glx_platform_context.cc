@@ -92,6 +92,17 @@ void GLXPlatformContext::Update() {
         break;
     }
   }
+
+  while (XCheckTypedEvent(display_, ClientMessage, &xev)) {
+    if(xev.xclient.data.l[0] == delete_message_) {
+      if (GetSignal("WindowClosed")->GetNumListeners()) {
+        GetSignal("WindowClosed")->Send(xev.xclient.data.l[0]);
+      } else {
+        Deinit();
+        return;
+      }
+    }
+  }
 }
 //-----------------------------------------------------------------------
 

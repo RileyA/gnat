@@ -20,6 +20,7 @@ set(GNAT_FILES
 
 add_library(gnat SHARED ${GNAT_FILES} )
 set_target_properties(gnat PROPERTIES LINKER_LANGUAGE CXX)
+target_link_libraries(gnat X11 GL)
 
 install(TARGETS gnat
 	RUNTIME DESTINATION ${INSTALL_RUNTIMES_TO}

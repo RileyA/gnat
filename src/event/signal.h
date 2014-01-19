@@ -41,6 +41,8 @@ class Signal {
   /** Removes all listeners from this Signal */
   void RemoveAllListeners();
 
+  int GetNumListeners() { return listeners_.size(); }
+
 private:
   List<Slot*> listeners_;
 };

@@ -4,6 +4,9 @@
 
 namespace gnat {
 
+Signal::Signal() {}
+//---------------------------------------------------------------------------
+
 Signal::~Signal() {
   RemoveAllListeners();
 }
