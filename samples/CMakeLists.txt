@@ -11,5 +11,6 @@ link_directories(../lib)
 
 add_executable(sample ${SAMPLE_FILES} )
 set_target_properties(sample PROPERTIES LINKER_LANGUAGE CXX)
+link_directories(/usr/local/lib)
 
-target_link_libraries(sample gnat)
+target_link_libraries(sample gnat SDL2)

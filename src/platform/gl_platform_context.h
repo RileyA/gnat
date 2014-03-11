@@ -8,22 +8,19 @@ namespace gnat {
 
 /** Interface to be implemented by platform-specific GL context 
  *		stuffs (i.e. Xlib/GLX in Linux). */
-class GLPlatformContext : public EventHandler {
+class GLPlatformContext : virtual public EventHandler {
  public:
-
-  virtual void Init(size_t h, size_t w, bool fullscreen) = 0;
-  virtual void Deinit() = 0;
-  virtual void Update() = 0;
+  virtual void InitDisplay(size_t w, size_t h, bool fullscreen) = 0;
+  virtual void UpdateDisplay() = 0;
   virtual void SwapBuffers() = 0;
   virtual long GetWindowHandle() = 0;
+  virtual void Deinit() = 0;
 
   size_t height() { return height_; }
   size_t width() { return width_; }
 
  protected:
-
   size_t width_, height_;
-
 };
 
 }

@@ -1,17 +1,18 @@
-#include <iostream>
 #include "event/observer.h"
-#include "gfx/platform/glx_platform_context.h"
+#include "event/signal.h"
+#include "platform/sdl/sdl_platform_context.h"
+#include "gfx/graphics_context.h"
 
 class ExitListener : public gnat::Observer {
  public:
 
   ExitListener() {
-    CreateSlot("WindowClosed", this, &ExitListener::ExitPressed);
+    CreateSlot("window_closed", this, &ExitListener::ExitPressed);
     pressed_ = false;
   }
 
   void ExitPressed(const gnat::Message& m) {
-     pressed_ = true;
+    pressed_ = true;
   }
 
   bool pressed() { return pressed_; }
@@ -22,18 +23,22 @@ class ExitListener : public gnat::Observer {
 };
 
 int main(int argc, char** argv) {
-  std::cout << "Test!\n";
-  gnat::GLPlatformContext* ctx = new gnat::GLXPlatformContext();
-  ctx->Init(800, 600, false);
+  gnat::GLPlatformContext* ctx = new gnat::SDLPlatformContext(true, false);
+  ctx->InitDisplay(800, 600, false);
+
   ExitListener listen;
-  ctx->GetSignal("WindowClosed")->AddListener(listen.GetSlot("WindowClosed"));
+  ctx->GetSignal("window_closed")->AddListener(listen.GetSlot("window_closed"));
+
+  gnat::GraphicsContext gfxctx(ctx);
 
   while(!listen.pressed()) {
-    ctx->Update();
-    ctx->SwapBuffers();
+    gfxctx.Update(0.0);
   }
 
   ctx->Deinit();
+  delete ctx;
 
   return 0;
 }
+
+
