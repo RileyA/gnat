@@ -15,7 +15,7 @@ namespace gnat {
       : r(r_in),
         g(g_in),
         b(b_in) {}
-    Color(T r, T g, T b, T a_in) {
+    Color(T r_in, T g_in, T b_in, T a_in)
       : r(r_in),
         g(g_in),
         b(b_in),

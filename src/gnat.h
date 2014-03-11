@@ -11,6 +11,7 @@ namespace gnat {
 // Some common typedefs
 typedef std::string String;
 typedef float Real;  // So we can swap to double precision somewhat painlessly.
+typedef unsigned char Byte;
 
 // TODO: enable C++11 and use template aliases
 template<typename T> class Vector : public std::vector<T> {};

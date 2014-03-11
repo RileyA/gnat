@@ -31,7 +31,12 @@ int main(int argc, char** argv) {
 
   gnat::GraphicsContext gfxctx(ctx);
 
+  float test = 0.0;
+  gnat::ColorF32 color(0.0, 0.0, 0.0, 0.0);
+
   while(!listen.pressed()) {
+    color.r += 0.001f;
+    gfxctx.SetClearColor(color);
     gfxctx.Update(0.0);
   }
 

@@ -3,6 +3,7 @@
 
 #include "gnat.h"
 #include "event/event_handler.h"
+#include "util/color.h"
 
 namespace gnat {
 
@@ -15,6 +16,8 @@ class GraphicsContext : public EventHandler {
   ~GraphicsContext();
 
   void Update(Real delta);
+
+  void SetClearColor(ColorF32 color);
 
  private:
 

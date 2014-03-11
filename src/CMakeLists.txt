@@ -24,6 +24,7 @@ set(GNAT_FILES
 
   third_party/FastDelegate/FastDelegate.h
 
+  util/color.h
   util/logger.cc
   util/logger.h
 	)
