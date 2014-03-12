@@ -27,6 +27,8 @@ set(GNAT_FILES
   util/color.h
   util/logger.cc
   util/logger.h
+  util/string_utils.cc
+  util/string_utils.h
 	)
 
 add_library(gnat SHARED ${GNAT_FILES} )
@@ -49,8 +51,13 @@ endif ()
 include_directories("src")
 
 set(TEST_FILES
+  event/signal_unittest.cc
+  event/slot_unittest.cc
+
   tests/test_main.cc
+
   util/color_unittest.cc
+  util/string_utils_unittest.cc
 	)
 
 add_executable(gnat_tests ${TEST_FILES})

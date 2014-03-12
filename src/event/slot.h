@@ -32,6 +32,9 @@ public:
   /** Stop listening to all Signals */
   void StopAllListening();
 
+  /** Get how many listeners we have. */
+  size_t GetListeningCount() const;
+
 private:
   
   // List of Signals being listened to.
@@ -42,6 +45,7 @@ private:
 
   // So signal can call |slot_|
   friend class Signal;
+  friend class SlotTest;
 };
 
 }  // namespace gnat

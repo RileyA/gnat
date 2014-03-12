@@ -31,7 +31,7 @@ void Signal::Fire(const Message& message) const {
 void Signal::AddListener(Slot* slot, bool notify) {
   listeners_.push_back(slot);
   if (notify) {
-    slot->ListenTo(this);
+    slot->ListenTo(this, false);
   }
 }
 //---------------------------------------------------------------------------

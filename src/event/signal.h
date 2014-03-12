@@ -36,7 +36,7 @@ class Signal {
 
   /** Removes a Listener from this Signal
    *    @param slot Pointer to the desired slot */
-  void RemoveListener(Slot* slot, bool notify=false);
+  void RemoveListener(Slot* slot, bool notify=true);
 
   /** Removes all listeners from this Signal */
   void RemoveAllListeners();
