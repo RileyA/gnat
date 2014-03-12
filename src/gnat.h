@@ -2,6 +2,7 @@
 #define gnat_gnat_H
 
 #include <map>
+#include <set>
 #include <vector>
 #include <string>
 #include <list>
@@ -19,6 +20,7 @@ typedef unsigned char Byte;
 template<typename T> class Vector : public std::vector<T> {};
 template<typename T> class List : public std::list<T> {};
 template<typename K, typename V> class Map : public std::map<K,V> {};
+template<typename K> class Set : public std::set<K> {};
 
 // TODO: Set up debug vs release build configs, and disable this in release.
 #define DCHECK(check) if (!(check)) \

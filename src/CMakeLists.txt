@@ -14,6 +14,10 @@ set(GNAT_FILES
 
   gfx/graphics_context.cc
   gfx/graphics_context.h
+  gfx/camera.cc
+  gfx/camera.h
+  gfx/node.cc
+  gfx/node.h
   gfx/math/quaternion.cc
   gfx/math/quaternion.h
   gfx/math/vector3.cc
