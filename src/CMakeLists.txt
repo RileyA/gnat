@@ -14,6 +14,8 @@ set(GNAT_FILES
 
   gfx/graphics_context.cc
   gfx/graphics_context.h
+  gfx/math/vector3.cc
+  gfx/math/vector3.h
 
   platform/gl_platform_context.h
   platform/input_platform_context.h
@@ -29,6 +31,8 @@ set(GNAT_FILES
   util/logger.h
   util/string_utils.cc
   util/string_utils.h
+  util/timer.cc
+  util/timer.h
 	)
 
 add_library(gnat SHARED ${GNAT_FILES} )
@@ -56,6 +60,8 @@ set(TEST_FILES
   event/signal_unittest.cc
   event/slot_unittest.cc
 
+  gfx/math/vector3_unittest.cc
+
   tests/test_main.cc
 
   util/color_unittest.cc
@@ -66,3 +72,12 @@ add_executable(gnat_tests ${TEST_FILES})
 set_target_properties(gnat_tests PROPERTIES LINKER_LANGUAGE CXX)
 target_link_libraries (gnat_tests gtest pthread gnat)
 
+set(PERFTEST_FILES
+  tests/test_main.cc
+  
+  gfx/math/vector3_perftest.cc
+	)
+
+add_executable(gnat_perftests ${PERFTEST_FILES})
+set_target_properties(gnat_perftests PROPERTIES LINKER_LANGUAGE CXX)
+target_link_libraries (gnat_perftests gtest pthread gnat)
