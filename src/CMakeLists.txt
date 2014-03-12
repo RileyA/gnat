@@ -51,6 +51,8 @@ endif ()
 include_directories("src")
 
 set(TEST_FILES
+  event/observer_unittest.cc
+  event/observable_unittest.cc
   event/signal_unittest.cc
   event/slot_unittest.cc
 

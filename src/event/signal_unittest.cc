@@ -1,4 +1,3 @@
-
 #include "event/dummy_event_target.h"
 #include "event/slot.h"
 #include "event/signal.h"
