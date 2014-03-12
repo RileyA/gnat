@@ -1,5 +1,5 @@
-#ifndef gnat_gfx_node_H
-#define gnat_gfx_node_H
+#ifndef gnat_gfx_scene_node_H
+#define gnat_gfx_scene_node_H
 
 #include "gnat.h"
 

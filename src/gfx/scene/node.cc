@@ -1,6 +1,6 @@
 #include "gnat.h"
 
-#include "gfx/node.h"
+#include "gfx/scene/node.h"
 
 namespace gnat {
 

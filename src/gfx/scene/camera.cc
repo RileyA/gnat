@@ -1,8 +1,8 @@
-#include "gfx/camera.h"
+#include "gfx/scene/camera.h"
 
 namespace gnat {
 
 Camera::Camera() {}
 Camera::~Camera() {}
 
-}
+}  // namespace gnat
