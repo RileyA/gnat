@@ -37,3 +37,23 @@ install(TARGETS gnat
 	RUNTIME DESTINATION ${INSTALL_RUNTIMES_TO}
 	LIBRARY DESTINATION ${INSTALL_LIBS_TO}
 	ARCHIVE DESTINATION ${INSTALL_LIBS_TO})
+
+if (WIN32)
+	set(LIB_PREFIX )
+	set(LIB_POSTFIX .lib)
+else ()
+	set(LIB_PREFIX lib)
+	set(LIB_POSTFIX .so)
+endif ()
+
+include_directories("src")
+
+set(TEST_FILES
+  tests/test_main.cc
+  util/color_unittest.cc
+	)
+
+add_executable(gnat_tests ${TEST_FILES})
+set_target_properties(gnat_tests PROPERTIES LINKER_LANGUAGE CXX)
+target_link_libraries (gnat_tests gtest pthread gnat)
+
