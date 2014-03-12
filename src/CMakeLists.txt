@@ -14,8 +14,16 @@ set(GNAT_FILES
 
   gfx/graphics_context.cc
   gfx/graphics_context.h
+  gfx/math/quaternion.cc
+  gfx/math/quaternion.h
   gfx/math/vector3.cc
   gfx/math/vector3.h
+  gfx/math/vector4.cc
+  gfx/math/vector4.h
+  gfx/math/matrix3.cc
+  gfx/math/matrix3.h
+  gfx/math/matrix4.cc
+  gfx/math/matrix4.h
 
   platform/gl_platform_context.h
   platform/input_platform_context.h
