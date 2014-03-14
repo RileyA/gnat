@@ -1,5 +1,8 @@
 #include "sdl_platform_context.h"
+
 #include "event/signal.h"
+
+#include <iostream>
 
 namespace gnat {
 
@@ -55,6 +58,13 @@ void SDLPlatformContext::InitDisplay(size_t w, size_t h, bool fullscreen) {
 
   context_ = SDL_GL_CreateContext(window_);
   SDL_CHECK_ERROR();
+
+  GLenum err = glewInit();
+
+  if (err != GLEW_OK) {
+    printf("Glew Init Error: ", glewGetErrorString(err));
+    exit(1);
+  }
 
   CreateSignal("window_closed");
   CreateSignal("window_resized");

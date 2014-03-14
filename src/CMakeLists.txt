@@ -18,6 +18,8 @@ set(GNAT_FILES
   gfx/scene/camera.h
   gfx/scene/node.cc
   gfx/scene/node.h
+  gfx/util/buffer_object.cc
+  gfx/util/buffer_object.h
   gfx/util/mesh.cc
   gfx/util/mesh.h
   gfx/math/quaternion.cc
@@ -51,7 +53,7 @@ set(GNAT_FILES
 
 add_library(gnat SHARED ${GNAT_FILES} )
 set_target_properties(gnat PROPERTIES LINKER_LANGUAGE CXX)
-target_link_libraries(gnat X11 GL SDL2)
+target_link_libraries(gnat SDL2 GLEW)
 
 install(TARGETS gnat
 	RUNTIME DESTINATION ${INSTALL_RUNTIMES_TO}
