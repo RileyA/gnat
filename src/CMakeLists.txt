@@ -18,6 +18,8 @@ set(GNAT_FILES
   gfx/scene/camera.h
   gfx/scene/node.cc
   gfx/scene/node.h
+  gfx/util/mesh.cc
+  gfx/util/mesh.h
   gfx/math/quaternion.cc
   gfx/math/quaternion.h
   gfx/math/vector3.cc

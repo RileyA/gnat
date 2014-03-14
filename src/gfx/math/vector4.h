@@ -15,11 +15,11 @@ class Vector4 {
   Vector4(Real x_in, Real y_in, Real z_in, Real w_in)
     : x(x_in), y(y_in), z(z_in), w(w_in) {}
 
-  Vector4 operator+(const Vector4& v) const {
+  Vector4 operator +(const Vector4& v) const {
     return Vector4(x + v.x, y + v.y, z + v.z, w + v.w);
   }
 
-  bool operator==(const Vector4& v) const {
+  bool operator ==(const Vector4& v) const {
     return x == v.x && y == v.y && z == v.z && w == v.w;
   }
 

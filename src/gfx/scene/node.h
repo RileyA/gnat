@@ -39,7 +39,7 @@ class Node {
   bool transform_dirty_;
   Matrix4 transform_;
 
-  // TODO: evaluate whether a list is beter here (storage v. perf, etc)
+  // TODO: evaluate whether a list is better here (storage v. perf, etc)
   Set<Node*> children_;
   
 };

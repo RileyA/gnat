@@ -15,11 +15,11 @@ class Vector3 {
   Vector3(Real x_in, Real y_in, Real z_in)
     : x(x_in), y(y_in), z(z_in) {}
 
-  Vector3 operator+(const Vector3& v) const {
+  Vector3 operator +(const Vector3& v) const {
     return Vector3(x + v.x, y + v.y, z + v.z);
   }
 
-  bool operator==(const Vector3& v) const {
+  bool operator ==(const Vector3& v) const {
     return x == v.x && y == v.y && z == v.z;
   }
 
