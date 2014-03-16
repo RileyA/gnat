@@ -2,9 +2,12 @@
 #define gnat_gnat_H
 
 #include <map>
+#include <set>
 #include <vector>
 #include <string>
 #include <list>
+#include <cstdio>
+#include <cstdlib>
 
 namespace gnat {
 
@@ -17,16 +20,17 @@ typedef unsigned char Byte;
 template<typename T> class Vector : public std::vector<T> {};
 template<typename T> class List : public std::list<T> {};
 template<typename K, typename V> class Map : public std::map<K,V> {};
+template<typename K> class Set : public std::set<K> {};
 
 // TODO: Set up debug vs release build configs, and disable this in release.
-#define DCHECK(check) if (!check) \
+#define DCHECK(check) if (!(check)) \
   {\
-    printf("Check fail: %s:%d", __FILE__, __LINE__); \
+    printf("Check fail: %s:%d\n", __FILE__, __LINE__); \
     exit(1);                                         \
   }
 
 #define NOTREACHED() {\
-  printf("NOTREACHED: %s:%d", __FILE__, __LINE__); \
+  printf("NOTREACHED: %s:%d\n", __FILE__, __LINE__); \
   exit(1);                                         \
   }
 

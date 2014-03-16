@@ -14,6 +14,24 @@ set(GNAT_FILES
 
   gfx/graphics_context.cc
   gfx/graphics_context.h
+  gfx/scene/camera.cc
+  gfx/scene/camera.h
+  gfx/scene/node.cc
+  gfx/scene/node.h
+  gfx/util/buffer_object.cc
+  gfx/util/buffer_object.h
+  gfx/util/mesh.cc
+  gfx/util/mesh.h
+  gfx/math/quaternion.cc
+  gfx/math/quaternion.h
+  gfx/math/vector3.cc
+  gfx/math/vector3.h
+  gfx/math/vector4.cc
+  gfx/math/vector4.h
+  gfx/math/matrix3.cc
+  gfx/math/matrix3.h
+  gfx/math/matrix4.cc
+  gfx/math/matrix4.h
 
   platform/gl_platform_context.h
   platform/input_platform_context.h
@@ -27,13 +45,55 @@ set(GNAT_FILES
   util/color.h
   util/logger.cc
   util/logger.h
+  util/string_utils.cc
+  util/string_utils.h
+  util/timer.cc
+  util/timer.h
 	)
 
 add_library(gnat SHARED ${GNAT_FILES} )
 set_target_properties(gnat PROPERTIES LINKER_LANGUAGE CXX)
-target_link_libraries(gnat X11 GL SDL2)
+target_link_libraries(gnat SDL2 GLEW)
 
 install(TARGETS gnat
 	RUNTIME DESTINATION ${INSTALL_RUNTIMES_TO}
 	LIBRARY DESTINATION ${INSTALL_LIBS_TO}
 	ARCHIVE DESTINATION ${INSTALL_LIBS_TO})
+
+if (WIN32)
+	set(LIB_PREFIX )
+	set(LIB_POSTFIX .lib)
+else ()
+	set(LIB_PREFIX lib)
+	set(LIB_POSTFIX .so)
+endif ()
+
+include_directories("src")
+
+set(TEST_FILES
+  event/observer_unittest.cc
+  event/observable_unittest.cc
+  event/signal_unittest.cc
+  event/slot_unittest.cc
+
+  gfx/math/vector3_unittest.cc
+
+  tests/test_main.cc
+
+  util/color_unittest.cc
+  util/string_utils_unittest.cc
+	)
+
+add_executable(gnat_tests ${TEST_FILES})
+set_target_properties(gnat_tests PROPERTIES LINKER_LANGUAGE CXX)
+target_link_libraries (gnat_tests gtest pthread gnat)
+
+set(PERFTEST_FILES
+  tests/test_main.cc
+  
+  gfx/math/vector3_perftest.cc
+	)
+
+add_executable(gnat_perftests ${PERFTEST_FILES})
+set_target_properties(gnat_perftests PROPERTIES LINKER_LANGUAGE CXX)
+target_link_libraries (gnat_perftests gtest pthread gnat)
