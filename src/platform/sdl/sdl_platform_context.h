@@ -33,7 +33,10 @@ class SDLPlatformContext : public InputPlatformContext,
  private:
 
   void HandleEvents();
-  
+
+  void OnKeyDown(const SDL_Event& event);
+  void OnKeyUp(const SDL_Event& event);
+
   SDL_Window* window_;
   SDL_GLContext context_;
 

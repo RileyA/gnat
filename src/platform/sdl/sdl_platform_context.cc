@@ -85,7 +85,24 @@ namespace gnat {
         case SDL_QUIT:
           GetSignal("window_closed")->Fire(NULL);
           break;
+        case SDL_KEYDOWN:
+          if (input_context_)
+            OnKeyDown(event);
+          break;
+        case SDL_KEYUP:
+          if (input_context_)
+            OnKeyUp(event);
+          break;
       }
     };
+  }
+
+  void SDLPlatformContext::OnKeyDown(const SDL_Event& event) {
+    DCHECK(event.type == SDL_KEYDOWN);
+    
+  }
+
+  void SDLPlatformContext::OnKeyUp(const SDL_Event& event) {
+    DCHECK(event.type == SDL_KEYUP);
   }
 }
