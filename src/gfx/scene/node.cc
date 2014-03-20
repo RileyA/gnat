@@ -15,8 +15,7 @@ Node::~Node() {
 }
 //---------------------------------------------------------------------------
 
-void Node::AddChild(Node* node) {
-  DCHECK(!HasChild(node));
+void Node::AddChild(Node* node) { DCHECK(!HasChild(node));
   children_.insert(node);
 }
 //---------------------------------------------------------------------------
@@ -58,6 +57,14 @@ void Node::SetOrientation(const Quaternion& orientation) {
 }
 //---------------------------------------------------------------------------
 
+void Node::Draw() {
+  for (Set<Node*>::iterator it = children_.begin(); it != children_.end();
+       ++it) {
+    (*it)->Draw();
+  }
+}
+//---------------------------------------------------------------------------
+
 Matrix4 Node::GetTransform() {
   if (transform_dirty_)
     ComputeTransform();
@@ -66,7 +73,9 @@ Matrix4 Node::GetTransform() {
 //---------------------------------------------------------------------------
 
 void Node::ComputeTransform() {
-  // TODO
+  transform_ = Matrix4(orientation_);
+  transform_.setTrans(position_);
+  transform_dirty_ = false;
 }
 //---------------------------------------------------------------------------
 

@@ -16,6 +16,8 @@ set(GNAT_FILES
   gfx/graphics_context.h
   gfx/scene/camera.cc
   gfx/scene/camera.h
+  gfx/scene/mesh.cc
+  gfx/scene/mesh.h
   gfx/scene/node.cc
   gfx/scene/node.h
   gfx/util/buffer_object.cc

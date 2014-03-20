@@ -25,6 +25,8 @@ class Node {
   void SetPosition(const Vector3& position);
   void SetOrientation(const Quaternion& orientation);
 
+  virtual void Draw();
+
   Vector3 GetPosition() { return position_; }
   Quaternion GetOrientation() {return orientation_; }
   Matrix4 GetTransform();

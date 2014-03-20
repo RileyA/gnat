@@ -30,6 +30,11 @@ int main(int argc, char** argv) {
   ctx->GetSignal("window_closed")->AddListener(listen.GetSlot("window_closed"));
 
   gnat::GraphicsContext gfxctx(ctx);
+  gfxctx.Init();
+
+  gnat::Camera* c = new gnat::Camera();
+
+  gfxctx.SetMainCamera(c);
 
   float test = 0.0;
   gnat::ColorF32 color(0.0, 0.0, 0.0, 0.0);
@@ -41,6 +46,7 @@ int main(int argc, char** argv) {
   }
 
   ctx->Deinit();
+  gfxctx.Deinit();
   delete ctx;
 
   return 0;
