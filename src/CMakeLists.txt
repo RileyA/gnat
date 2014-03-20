@@ -20,8 +20,8 @@ set(GNAT_FILES
   gfx/scene/node.h
   gfx/util/buffer_object.cc
   gfx/util/buffer_object.h
-  gfx/util/mesh.cc
-  gfx/util/mesh.h
+  gfx/util/mesh_data.cc
+  gfx/util/mesh_data.h
   gfx/math/quaternion.cc
   gfx/math/quaternion.h
   gfx/math/vector3.cc

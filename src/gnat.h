@@ -9,6 +9,9 @@
 #include <cstdio>
 #include <cstdlib>
 
+// TODO: <cstdint>?
+#include <inttypes.h>
+
 namespace gnat {
 
 // Some common typedefs

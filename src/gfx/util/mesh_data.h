@@ -2,12 +2,15 @@
 #define gnat_gfx_util_mesh_data_H
 
 #include "gnat.h"
+#include "gfx/math/vector3.h"
 #include "util/color.h"
 
 namespace gnat {
 
 /** A class containing raw mesh data (usually we'll want to keep mesh
  *  data in GPU memory, so avoid using this in realtime cases). */
+
+// TODO: Write an interleaved version of this to minimize copies.
 class MeshData {
  public:
 
@@ -16,7 +19,7 @@ class MeshData {
 
   void AddPosition(Vector3 p);
   void AddNormal(Vector3 n);
-  void AddDiffuse(ColorF32);
+  void AddDiffuse(ColorF32 c);
 
   void AddTexcoordSet();
   void AddTexcoord(uint32_t index, float u, float v);
@@ -32,6 +35,8 @@ class MeshData {
 
  private:
   
+  // TODO: should these be Real rather than float? GL precision is likely to
+  // be a different beast than anywhere else, so for the meantime 'float' works.
   Vector<float> positions_;
   Vector<float> normals_;
   Vector<float> diffuse_;
