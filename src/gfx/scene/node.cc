@@ -7,9 +7,7 @@ namespace gnat {
 Node::Node()
   : position_(Vector3::ZERO),
     orientation_(Quaternion::IDENTITY),
-    transform_dirty_(false) {
-  transform_.Zero();
-}
+    transform_dirty_(false) {}
 //---------------------------------------------------------------------------
 
 Node::~Node() {

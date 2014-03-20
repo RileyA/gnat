@@ -8,6 +8,7 @@
 #include <list>
 #include <cstdio>
 #include <cstdlib>
+#include <cmath>
 
 // TODO: <cstdint>?
 #include <inttypes.h>
