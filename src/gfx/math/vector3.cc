@@ -9,15 +9,16 @@ const Vector3 Vector3::ZERO(0.0, 0.0, 0.0);
 const Vector3 Vector3::UNIT_X(1.0, 0.0, 0.0);
 const Vector3 Vector3::UNIT_Y(0.0, 1.0, 0.0);
 const Vector3 Vector3::UNIT_Z(0.0, 0.0, 1.0);
-const Vector3 Vector3::NEGATIVE_UNIT_X( -1.0,  0.0,  0.0 );
-const Vector3 Vector3::NEGATIVE_UNIT_Y(  0.0, -1.0,  0.0 );
-const Vector3 Vector3::NEGATIVE_UNIT_Z(  0.0,  0.0, -1.0 );
+const Vector3 Vector3::NEGATIVE_UNIT_X(-1.0, 0.0, 0.0);
+const Vector3 Vector3::NEGATIVE_UNIT_Y(0.0, -1.0, 0.0);
+const Vector3 Vector3::NEGATIVE_UNIT_Z(0.0, 0.0, -1.0);
 const Vector3 Vector3::UNIT_SCALE(1.0, 1.0, 1.0);
 
-Quaternion Vector3::GetRotationTo(const Vector3& dest, const Vector3& fallback) const {
+Quaternion Vector3::GetRotationTo(const Vector3& dest,
+                                  const Vector3& fallback) const {
   // Based on Stan Melax's article in Game Programming Gems
-  Vector3 fallbackAxis = fallback;
-  Quaternion q(0,0,0,0);
+  Vector3 fallback_axis = fallback;
+  Quaternion q(0, 0, 0, 0);
   Vector3 v0 = *this;
   Vector3 v1 = dest;
   v0.Normalize();
@@ -26,27 +27,27 @@ Quaternion Vector3::GetRotationTo(const Vector3& dest, const Vector3& fallback) 
   Real d = v0.DotProduct(v1);
 
   // If dot == 1, vectors are the same
-  if(d >= 1.0f) {
+  if (d >= 1.0f) {
     return Quaternion::IDENTITY;
   }
 
-  if(d < (1e-6f - 1.0f)) {
-    if(fallbackAxis != Vector3::ZERO) {
+  if (d < (1e-6f - 1.0f)) {
+    if (fallback_axis != Vector3::ZERO) {
       // rotate 180 degrees about the fallback axis
-      q.FromAngleAxis(3.141592, fallbackAxis);
+      q.FromAngleAxis(3.141592, fallback_axis);
     } else {
       // Generate an axis
       Vector3 axis = Vector3::UNIT_X.CrossProduct(*this);
 
-      if(axis.IsZeroLength()) {// pick another if colinear
+      if (axis.IsZeroLength()) {  // pick another if colinear
         axis = Vector3::UNIT_Y.CrossProduct(*this);
         axis.Normalize();
         q.FromAngleAxis(3.141592, axis);
       }
     }
   } else {
-    Real s = sqrt( (1+d)*2 );
-      Real invs = 1 / s;
+    Real s = sqrt((1 + d) * 2);
+    Real invs = 1 / s;
     Vector3 c = v0.CrossProduct(v1);
     q.x = c.x * invs;
     q.y = c.y * invs;
