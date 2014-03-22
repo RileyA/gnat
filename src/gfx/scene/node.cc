@@ -74,7 +74,7 @@ Matrix4 Node::GetTransform() {
 
 void Node::ComputeTransform() {
   transform_ = Matrix4(orientation_);
-  transform_.setTrans(position_);
+  transform_.SetTrans(position_);
   transform_dirty_ = false;
 }
 //---------------------------------------------------------------------------
