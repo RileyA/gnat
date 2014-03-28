@@ -79,6 +79,7 @@ set(TEST_FILES
   event/slot_unittest.cc
 
   gfx/math/vector3_unittest.cc
+  gfx/scene/node_unittest.cc
 
   tests/test_main.cc
 

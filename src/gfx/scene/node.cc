@@ -7,34 +7,54 @@ namespace gnat {
 Node::Node()
   : position_(Vector3::ZERO),
     orientation_(Quaternion::IDENTITY),
-    transform_dirty_(false) {}
+    transform_(Matrix4::IDENTITY),
+    transform_dirty_(false),
+    parent_(NULL) {}
 //---------------------------------------------------------------------------
 
 Node::~Node() {
   RemoveAllChildren();
+  if (parent_)
+    parent_->RemoveChild(this);
 }
 //---------------------------------------------------------------------------
 
-void Node::AddChild(Node* node) { DCHECK(!HasChild(node));
-  children_.insert(node);
+void Node::AddChild(Node* node) {
+  DCHECK(!HasChild(node));
+  DCHECK(!node->parent_);
+  children_.push_back(node);
+  node->parent_ = this;
 }
 //---------------------------------------------------------------------------
 
 bool Node::HasChild(Node* node) {
-  return children_.count(node);
+  for (List<Node*>::iterator it = children_.begin(); it != children_.end();
+       ++it) {
+    if (*it == node)
+      return true;
+  }
+  return false;
 }
 //---------------------------------------------------------------------------
 
 void Node::RemoveChild(Node* node) {
-  Set<Node*>::iterator it = children_.find(node);
-  if (it != children_.end())
-    children_.erase(it);
-  else
-    NOTREACHED();
+  for (List<Node*>::iterator it = children_.begin(); it != children_.end();
+       ++it) {
+    if (*it == node) {
+      (*it)->parent_ = NULL;
+      children_.erase(it);
+      return;
+    }
+  }
+  NOTREACHED();
 }
 //---------------------------------------------------------------------------
 
 void Node::RemoveAllChildren() {
+  for (List<Node*>::iterator it = children_.begin(); it != children_.end();
+       ++it) {
+    (*it)->parent_ = NULL;
+  }
   children_.clear();
 }
 //---------------------------------------------------------------------------
@@ -57,12 +77,7 @@ void Node::SetOrientation(const Quaternion& orientation) {
 }
 //---------------------------------------------------------------------------
 
-void Node::Draw() {
-  for (Set<Node*>::iterator it = children_.begin(); it != children_.end();
-       ++it) {
-    (*it)->Draw();
-  }
-}
+void Node::Draw() {}
 //---------------------------------------------------------------------------
 
 Matrix4 Node::GetTransform() {
@@ -75,6 +90,8 @@ Matrix4 Node::GetTransform() {
 void Node::ComputeTransform() {
   transform_ = Matrix4(orientation_);
   transform_.SetTrans(position_);
+  if (parent_)
+    transform_ = parent_->GetTransform() * transform_;
   transform_dirty_ = false;
 }
 //---------------------------------------------------------------------------

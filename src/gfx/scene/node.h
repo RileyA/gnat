@@ -24,26 +24,28 @@ class Node {
 
   void SetPosition(const Vector3& position);
   void SetOrientation(const Quaternion& orientation);
+  Vector3 GetPosition() { return position_; }
+  Quaternion GetOrientation() { return orientation_; }
 
   virtual void Draw();
 
-  Vector3 GetPosition() { return position_; }
-  Quaternion GetOrientation() {return orientation_; }
   Matrix4 GetTransform();
-  
+
+  Node* parent() { return parent_; }
+
  private:
 
   void ComputeTransform();
+  void SetParent(Node* n);
 
   Vector3 position_;
   Quaternion orientation_;
 
-  bool transform_dirty_;
   Matrix4 transform_;
+  bool transform_dirty_;
 
-  // TODO: evaluate whether a list is better here (storage v. perf, etc)
-  Set<Node*> children_;
-  
+  List<Node*> children_;
+  Node* parent_;
 };
 
 }  // namespace gnat
