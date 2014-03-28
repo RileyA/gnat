@@ -164,6 +164,11 @@ Quaternion Quaternion::Slerp(Real t,
 }
 //-----------------------------------------------------------------------
 
+bool Quaternion::operator==(const Quaternion& q) const {
+  return x == q.x && y == q.y && z == q.z && w == q.w;
+}
+//-----------------------------------------------------------------------
+
 Vector3 Quaternion::operator*(Vector3 v) {
   Vector3 uv(0, 0, 0), uuv(0, 0, 0);
   Vector3 qvec(x, y, z);

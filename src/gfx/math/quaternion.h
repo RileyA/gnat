@@ -59,6 +59,7 @@ class Quaternion {
   * 		@returns The inverse Quaternion */
   Quaternion Inverse() const;
 
+  bool operator==(const Quaternion& q) const;
   Vector3 operator*(Vector3 vect);
   Quaternion operator-(const Quaternion& q) const;
   Quaternion operator+(const Quaternion& q) const;
