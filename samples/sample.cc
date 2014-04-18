@@ -23,6 +23,7 @@ class ExitListener : public gnat::Observer {
 };
 
 int main(int argc, char** argv) {
+  DCHECK(false);
   gnat::GLPlatformContext* ctx = new gnat::SDLPlatformContext(true, false);
   ctx->InitDisplay(800, 600, false);
 

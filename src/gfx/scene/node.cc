@@ -24,10 +24,12 @@ void Node::AddChild(Node* node) {
   DCHECK(!HasChild(node));
   DCHECK(!node->parent_);
 
+#ifdef DEBUG
   // Ensure we aren't creating a cycle.
   Node* p = this;
   while (p = p->parent_)
     DCHECK(p != node);
+#endif
 
   children_.push_back(node);
   node->parent_ = this;
