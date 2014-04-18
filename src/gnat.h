@@ -26,8 +26,6 @@ template<typename T> class List : public std::list<T> {};
 template<typename K, typename V> class Map : public std::map<K,V> {};
 template<typename K> class Set : public std::set<K> {};
 
-// TODO: Set up debug vs release build configs, and disable this in release.
-
 #ifdef DEBUG
 #define DCHECK(check) if (!(check)) \
   {\
