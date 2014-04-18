@@ -40,8 +40,6 @@ void GraphicsContext::Update(Real delta) {
 //---------------------------------------------------------------------------
 
 void GraphicsContext::RenderFrame(Camera* camera) {
-  // TODO Set up matrices
-  root_.Draw();
 }
 //---------------------------------------------------------------------------
 
