@@ -3,12 +3,12 @@
 
 #include "gnat.h"
 
-#include "gfx/scene/node.h"
+#include "gfx/scene/drawable.h"
 #include "gfx/util/mesh_data.h"
 
 namespace gnat {
 
-class Mesh : public Node {
+class Mesh {
  public:
 
   Mesh(MeshData* mesh);

@@ -1,5 +1,6 @@
 #include "gnat.h"
 
+#include "gfx/scene/drawable.h"
 #include "gfx/scene/node.h"
 
 namespace gnat {
@@ -22,6 +23,14 @@ Node::~Node() {
 void Node::AddChild(Node* node) {
   DCHECK(!HasChild(node));
   DCHECK(!node->parent_);
+
+#ifdef DEBUG
+  // Ensure we aren't creating a cycle.
+  Node* p = this;
+  while (p = p->parent_)
+    DCHECK(p != node);
+#endif
+
   children_.push_back(node);
   node->parent_ = this;
 }
@@ -59,6 +68,36 @@ void Node::RemoveAllChildren() {
 }
 //---------------------------------------------------------------------------
 
+void Node::AddDrawable(Drawable* drawable) {
+  drawables_.push_back(drawable);
+  drawable->SetParent(this);
+}
+//---------------------------------------------------------------------------
+
+void Node::RemoveDrawable(Drawable* drawable) {
+  for (List<Drawable *>::iterator it = drawables_.begin();
+       it != drawables_.end(); ++it) {
+    (*it)->SetParent(NULL);
+    drawables_.erase(it);
+  }
+  drawables_.clear();
+}
+//---------------------------------------------------------------------------
+
+void Node::RemoveAllDrawables() {
+  for (List<Drawable *>::iterator it = drawables_.begin();
+       it != drawables_.end(); ++it) {
+    (*it)->SetParent(NULL);
+  }
+  drawables_.clear();
+}
+//---------------------------------------------------------------------------
+
+int Node::GetNumDrawables() {
+  return drawables_.size();
+}
+//---------------------------------------------------------------------------
+
 int Node::GetNumChildren() {
   return children_.size();
 }
@@ -75,9 +114,6 @@ void Node::SetOrientation(const Quaternion& orientation) {
   // TODO see if a check for equality saves us much computation?
   transform_dirty_ = true;
 }
-//---------------------------------------------------------------------------
-
-void Node::Draw() {}
 //---------------------------------------------------------------------------
 
 Matrix4 Node::GetTransform() {

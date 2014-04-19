@@ -9,6 +9,8 @@
 
 namespace gnat {
 
+class Drawable;
+
 /** A node in the gfx scene graph */
 class Node {
  public:
@@ -22,12 +24,18 @@ class Node {
   void RemoveAllChildren();
   int GetNumChildren();
 
+  void AddDrawable(Drawable* drawable);
+  void RemoveDrawable(Drawable* drawable);
+  bool HasDrawable(Drawable* drawable);
+  void RemoveAllDrawables();
+  int GetNumDrawables();
+
+  List<Drawable*>::iterator GetDrawables() { return drawables_.begin(); }
+
   void SetPosition(const Vector3& position);
   void SetOrientation(const Quaternion& orientation);
   Vector3 GetPosition() { return position_; }
   Quaternion GetOrientation() { return orientation_; }
-
-  virtual void Draw();
 
   Matrix4 GetTransform();
 
@@ -46,6 +54,8 @@ class Node {
 
   List<Node*> children_;
   Node* parent_;
+
+  List<Drawable*> drawables_;
 };
 
 }  // namespace gnat

@@ -12,10 +12,14 @@ set(GNAT_FILES
   event/slot.cc
   event/slot.h
 
+  gfx/material/material.cc
+  gfx/material/material.h
   gfx/graphics_context.cc
   gfx/graphics_context.h
   gfx/scene/camera.cc
   gfx/scene/camera.h
+  gfx/scene/drawable.cc
+  gfx/scene/drawable.h
   gfx/scene/mesh.cc
   gfx/scene/mesh.h
   gfx/scene/node.cc
@@ -83,6 +87,7 @@ set(TEST_FILES
 
   gfx/math/vector3_unittest.cc
   gfx/scene/node_unittest.cc
+  gfx/scene/drawable_unittest.cc
 
   tests/test_main.cc
 
