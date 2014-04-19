@@ -71,7 +71,7 @@ inline void* BufferObject<BUFFER_TYPE>::GetMappedBuffer() {
 
 template <GLenum BUFFER_TYPE>
 void BufferObject<BUFFER_TYPE>::UnmapBuffer() {
-  DCHECK(IsValid);
+  DCHECK(IsValid());
   if (is_mapped_) {
     // if already bound, keep it that way, otherwise bind and unbind
     bool wasBound = is_bound_;

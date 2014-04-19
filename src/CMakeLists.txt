@@ -14,6 +14,8 @@ set(GNAT_FILES
 
   gfx/graphics_context.cc
   gfx/graphics_context.h
+  gfx/material/material.cc
+  gfx/material/material.h
   gfx/scene/camera.cc
   gfx/scene/camera.h
   gfx/scene/mesh.cc
@@ -53,9 +55,11 @@ set(GNAT_FILES
   util/timer.h
 	)
 
+find_package(OpenGL)
+
 add_library(gnat SHARED ${GNAT_FILES} )
 set_target_properties(gnat PROPERTIES LINKER_LANGUAGE CXX)
-target_link_libraries(gnat SDL2 GLEW)
+target_link_libraries(gnat SDL2 GLEW ${OPENGL_LIBRARIES})
 
 install(TARGETS gnat
 	RUNTIME DESTINATION ${INSTALL_RUNTIMES_TO}
@@ -71,6 +75,7 @@ else ()
 endif ()
 
 include_directories("src")
+include_directories("src/third_party/glew/include")
 
 set(TEST_FILES
   event/observer_unittest.cc

@@ -3,7 +3,7 @@
 
 #include "gnat.h"
 
-#include "GL/glew.h"
+#include "glew.h"
 #include "gl.h"
 
 namespace gnat {

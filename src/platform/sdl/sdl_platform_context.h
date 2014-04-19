@@ -4,7 +4,7 @@
 #include "gnat.h"
 #include "platform/input_platform_context.h"
 #include "platform/gl_platform_context.h"
-#include  "GL/glew.h"
+#include "glew.h"
 #include "SDL.h"
 #include "SDL_opengl.h"
 
