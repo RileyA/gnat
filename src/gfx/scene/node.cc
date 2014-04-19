@@ -123,6 +123,15 @@ Matrix4 Node::GetTransform() {
 }
 //---------------------------------------------------------------------------
 
+void Node::Visit(Node::Visitor* visitor) {
+  visitor->Visit(this);
+  for (List<Node*>::iterator it = children_.begin(); it != children_.end();
+       ++it) {
+    (*it)->Visit(visitor);
+  }
+}
+//---------------------------------------------------------------------------
+
 void Node::ComputeTransform() {
   transform_ = Matrix4(orientation_);
   transform_.SetTrans(position_);

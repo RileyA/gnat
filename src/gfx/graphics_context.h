@@ -3,8 +3,9 @@
 
 #include "gnat.h"
 #include "event/event_handler.h"
-#include "gfx/scene/node.h"
 #include "gfx/scene/camera.h"
+#include "gfx/scene/node.h"
+#include "gfx/scene/scene_manager.h"
 #include "util/color.h"
 
 namespace gnat {
@@ -38,6 +39,8 @@ class GraphicsContext : public EventHandler {
 
   // Root scene node.
   Node root_;
+
+  SceneManager scene_manager_;
 };
 
 }  // namespace gnat

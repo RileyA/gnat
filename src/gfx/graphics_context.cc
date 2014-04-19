@@ -40,6 +40,7 @@ void GraphicsContext::Update(Real delta) {
 //---------------------------------------------------------------------------
 
 void GraphicsContext::RenderFrame(Camera* camera) {
+  scene_manager_.Draw(&root_, camera);
 }
 //---------------------------------------------------------------------------
 

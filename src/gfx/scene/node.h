@@ -37,6 +37,13 @@ class Node {
   Vector3 GetPosition() { return position_; }
   Quaternion GetOrientation() { return orientation_; }
 
+  class Visitor {
+   public:
+    virtual ~Visitor() {}
+    virtual void Visit(Node* n) = 0;
+  };
+  void Visit(Visitor* visitor);
+
   Matrix4 GetTransform();
 
   Node* parent() { return parent_; }
