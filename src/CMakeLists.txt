@@ -14,8 +14,6 @@ set(GNAT_FILES
 
   gfx/graphics_context.cc
   gfx/graphics_context.h
-  gfx/material/material.cc
-  gfx/material/material.h
   gfx/scene/camera.cc
   gfx/scene/camera.h
   gfx/scene/mesh.cc
