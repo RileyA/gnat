@@ -35,16 +35,17 @@ void Mesh::CreateFromMeshData(MeshData* data) {
   memcpy(buffer, data->indices(), num_indices_ * sizeof(uint32_t));
   ibo_.UnmapBuffer();
 
- glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE,
-                       stride_, BUFFER_OFFSET(0));
- glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, stride_,
-                       BUFFER_OFFSET(sizeof(float)*3));
 }
 
 void Mesh::Draw() {
   vbo_.Bind();
   ibo_.Bind();
 
+  // TODO
+  //glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE,
+  //                      stride_, BUFFER_OFFSET(0));
+  //glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, stride_,
+  //                      BUFFER_OFFSET(sizeof(float)*3));
   glDrawElements(GL_TRIANGLES, num_indices_, GL_UNSIGNED_INT, (GLvoid*)0);
 
   ibo_.Unbind();

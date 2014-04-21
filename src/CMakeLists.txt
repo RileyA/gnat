@@ -14,6 +14,10 @@ set(GNAT_FILES
 
   gfx/material/material.cc
   gfx/material/material.h
+  gfx/material/program.cc
+  gfx/material/program.h
+  gfx/material/shader.cc
+  gfx/material/shader.h
   gfx/graphics_context.cc
   gfx/graphics_context.h
   gfx/scene/camera.cc

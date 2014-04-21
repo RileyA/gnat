@@ -5,15 +5,25 @@
 
 namespace gnat {
 
+class Program;
+
 class Material {
  public:
   Material(String name);
   virtual ~Material();
 
+  void Use();
+  void DoneUsing();
+
   const String& get_name() const { return name_; }
+
+  void set_shader(Program* p) { shader_program_ = p; }
 
  private:
   String name_;
+  bool using_;
+
+  Program* shader_program_;
 };
 
 }
