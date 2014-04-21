@@ -18,7 +18,7 @@ public:
   ~BufferObject();
 
 	bool operator < (const BufferObject<BUFFER_TYPE>& other) const {
-		return size() < other.getSize();
+		return size() < other.size();
 	}
 
 	inline size_t size() const { return size_; }
@@ -43,8 +43,6 @@ private:
 
 };
 
-// Magic typedefs to hint to the compiler that we'll use these specializations,
-// we'll hopefully get linker errors if we try to use anything else.
 typedef BufferObject<GL_PIXEL_UNPACK_BUFFER> PixelBufferObject;
 typedef BufferObject<GL_PIXEL_PACK_BUFFER> PixelBufferObjectPack;
 typedef BufferObject<GL_ARRAY_BUFFER> VertexBufferObject;

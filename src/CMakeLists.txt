@@ -22,6 +22,8 @@ set(GNAT_FILES
   gfx/scene/drawable.h
   gfx/scene/mesh.cc
   gfx/scene/mesh.h
+  gfx/scene/mesh_drawable.cc
+  gfx/scene/mesh_drawable.h
   gfx/scene/node.cc
   gfx/scene/node.h
   gfx/scene/scene_manager.cc

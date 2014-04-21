@@ -32,6 +32,17 @@ class MeshData {
   float* normals() { return &normals_[0]; }
   float* diffuse() { return &diffuse_[0]; }
   float* texcoords() { return &diffuse_[0]; }
+  uint32_t* indices() { return &indices_[0]; }
+
+  bool HasNormals() { return !normals_.empty(); }
+  bool HasDiffuse() { return !diffuse_.empty(); }
+  bool IsValid(); 
+
+  // Size of vertices not counting indices.
+  size_t size();
+
+  size_t num_verts() { return positions_.size() / 3; }
+  size_t num_indices() { return indices_.size() / 3; }
 
  private:
   

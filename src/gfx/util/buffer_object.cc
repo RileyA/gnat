@@ -26,6 +26,10 @@ BufferObject<BUFFER_TYPE>::BufferObject(size_t size, GLuint usage)
 //-----------------------------------------------------------------------
 
 template <GLenum BUFFER_TYPE>
+BufferObject<BUFFER_TYPE>::~BufferObject() {}
+//-----------------------------------------------------------------------
+
+template <GLenum BUFFER_TYPE>
 void BufferObject<BUFFER_TYPE>::Bind() {
   DCHECK(IsValid());
   if (!is_bound_) {
@@ -93,5 +97,13 @@ void BufferObject<BUFFER_TYPE>::Destroy() {
   handle_ = 0;
 }
 //-----------------------------------------------------------------------
+
+// Magic declarations to hint to the compiler that we'll use these
+// specializations, we'll hopefully get linker errors if we try to use
+// anything else.
+template class BufferObject<GL_PIXEL_UNPACK_BUFFER>;
+template class BufferObject<GL_PIXEL_PACK_BUFFER>;
+template class BufferObject<GL_ARRAY_BUFFER>;
+template class BufferObject<GL_ELEMENT_ARRAY_BUFFER>;
 
 }  // namespace gnat

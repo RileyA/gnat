@@ -54,5 +54,28 @@ void MeshData::AddTriangle(uint32_t v1, uint32_t v2, uint32_t v3) {
   indices_.push_back(v3);
 }
 //---------------------------------------------------------------------------
+  
+bool MeshData::IsValid() {
+  int num_verts = positions_.size() / 3;
+  if (positions_.size() % 3 != 0)
+    return false;
+  if (HasNormals() && normals_.size() != num_verts * 3)
+    return false;
+  if (HasDiffuse() && diffuse_.size() != num_verts)
+    return false;
+  return true;
+}
+//---------------------------------------------------------------------------
+
+// Size of vertices not counting indices.
+size_t MeshData::size() {
+  DCHECK(IsValid());
+  size_t out = 0;
+  out += positions_.size() * sizeof(float);
+  out += normals_.size() * sizeof(float);
+  out += diffuse_.size() * sizeof(uint8_t);  // we'll round to 8bit
+  return out;
+}
+//---------------------------------------------------------------------------
 
 }  // namespace gnat
