@@ -57,6 +57,8 @@ set(GNAT_FILES
   third_party/FastDelegate/FastDelegate.h
 
   util/color.h
+  util/file_utils.cc
+  util/file_utils.h
   util/logger.cc
   util/logger.h
   util/string_utils.cc
@@ -100,6 +102,7 @@ set(TEST_FILES
   tests/test_main.cc
 
   util/color_unittest.cc
+  util/file_utils_unittest.cc
   util/string_utils_unittest.cc
 	)
 
