@@ -3,6 +3,8 @@
 
 #include "gnat.h"
 
+#include "util/scoped_ptr.h"
+
 namespace gnat {
 
 class JsonValue {
@@ -16,7 +18,7 @@ class JsonValue {
     kArray,
   };
 
-  static JsonValue* Parse(String text);
+  static scoped_ptr<JsonValue> Parse(String text);
 
   ~JsonValue();
 

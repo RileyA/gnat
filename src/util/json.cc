@@ -22,20 +22,19 @@ void safe_match(String match, const char** string) {
 }
 //---------------------------------------------------------------------------
 
-JsonValue* JsonValue::Parse(String text) {
+scoped_ptr<JsonValue> JsonValue::Parse(String text) {
   text = RemoveWhitespace(text);
   const char* position = text.c_str();
 
   // Assume a json file always contains a top-level object.
   if (*position != '{')
-    return NULL;
+    return scoped_ptr<JsonValue>(NULL);
 
-  JsonValue* out = ParseValue(&position);
+  scoped_ptr<JsonValue> out = scoped_ptr<JsonValue>(ParseValue(&position));
 
   // If we had more content afterwards, we're invalid.
-  if (out && *position != '}') {
-    delete out;
-    return NULL;
+  if (out.get() && *position != '}') {
+    return scoped_ptr<JsonValue>(NULL);
   }
 
   return out;

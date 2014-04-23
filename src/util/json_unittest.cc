@@ -1,5 +1,6 @@
 #include "gtest/gtest.h"
 #include "util/json.h"
+#include "util/scoped_ptr.h"
 
 namespace gnat {
 
@@ -17,41 +18,37 @@ namespace gnat {
 
   TEST(JsonTest, ReadEmpty) {
     String str = "{}";
-    JsonValue* obj = JsonValue::Parse(str);
-    EXPECT_EQ(obj->size(), 0);
-    delete obj;
+    scoped_ptr<JsonValue> value = JsonValue::Parse(str);
+    EXPECT_EQ(value->size(), 0);
   }
 
   TEST(JsonTest, ReadSimple) {
     String str = "{\"abc\":true}";
-    JsonValue* obj = JsonValue::Parse(str);
-    EXPECT_EQ(obj->size(), 1);
-    EXPECT_EQ((*obj)["abc"], true);
-    delete obj;
+    scoped_ptr<JsonValue> value = JsonValue::Parse(str);
+    EXPECT_EQ(value->size(), 1);
+    EXPECT_EQ((*value)["abc"], true);
   }
 
   TEST(JsonTest, ReadStrings) {
     String str = "{\"abc\":\"foo\",\"def\":\"bar\"}";
-    JsonValue* obj = JsonValue::Parse(str);
-    EXPECT_EQ(obj->size(), 2);
-    EXPECT_EQ(0, strcmp("foo", (*obj)["abc"]));
-    EXPECT_EQ(0, strcmp("bar", (*obj)["def"]));
-    delete obj;
+    scoped_ptr<JsonValue> value = JsonValue::Parse(str);
+    EXPECT_EQ(value->size(), 2);
+    EXPECT_EQ(0, strcmp("foo", (*value)["abc"]));
+    EXPECT_EQ(0, strcmp("bar", (*value)["def"]));
   }
 
   TEST(JsonTest, ReadArrayOfStrings) {
     String str = "{\"abc\" : [\"foo\",\"bar\"]}";
-    JsonValue* obj = JsonValue::Parse(str);
-    EXPECT_EQ(obj->size(), 1);
-    EXPECT_EQ((*obj)["abc"].size(), 2);
-    EXPECT_EQ(0, strcmp("foo", (*obj)["abc"][0]));
-    EXPECT_EQ(0, strcmp("bar", (*obj)["abc"][1]));
-    delete obj;
+    scoped_ptr<JsonValue> value = JsonValue::Parse(str);
+    EXPECT_EQ(value->size(), 1);
+    EXPECT_EQ((*value)["abc"].size(), 2);
+    EXPECT_EQ(0, strcmp("foo", (*value)["abc"][0]));
+    EXPECT_EQ(0, strcmp("bar", (*value)["abc"][1]));
   }
 
   TEST(JsonTest, ReadInvalid) {
     String str = "{\"abc\" : [\"foo\",\"bar\", false]}";
-    JsonValue* obj = JsonValue::Parse(str);
-    EXPECT_FALSE(obj);
+    scoped_ptr<JsonValue> value = JsonValue::Parse(str);
+    EXPECT_FALSE(value.get());
   }
 }

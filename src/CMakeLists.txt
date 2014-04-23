@@ -63,6 +63,7 @@ set(GNAT_FILES
   util/json.h
   util/logger.cc
   util/logger.h
+  util/scoped_ptr.h
   util/string_utils.cc
   util/string_utils.h
   util/timer.cc
