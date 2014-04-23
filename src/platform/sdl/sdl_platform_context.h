@@ -26,7 +26,7 @@ class SDLPlatformContext : public InputPlatformContext,
   // InputPlatformContext impl
   virtual void InitInput();
   virtual void UpdateInput();
-  virtual bool IsKeyPressed();
+  virtual bool IsKeyPressed(uint32_t code);
 
   // Shared fns
   virtual void Deinit();
@@ -43,6 +43,8 @@ class SDLPlatformContext : public InputPlatformContext,
 
   bool gl_context_;
   bool input_context_;
+
+  Set<SDL_Scancode> keys_down_;
 };
 
 }  // namespace gnat

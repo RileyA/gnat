@@ -87,15 +87,16 @@ long SDLPlatformContext::GetWindowHandle() {
 }
 
 void SDLPlatformContext::InitInput() {
+  CreateSignal("key_down");
+  CreateSignal("key_up");
 }
 
 void SDLPlatformContext::UpdateInput() {
   HandleEvents();
 }
 
-bool SDLPlatformContext::IsKeyPressed() {
-  NOTREACHED();
-  return false;
+bool SDLPlatformContext::IsKeyPressed(uint32_t code) {
+  return keys_down_.count((SDL_Scancode)code);
 }
 
 void SDLPlatformContext::Deinit() {
@@ -127,11 +128,14 @@ void SDLPlatformContext::HandleEvents() {
 
 void SDLPlatformContext::OnKeyDown(const SDL_Event& event) {
   DCHECK(event.type == SDL_KEYDOWN);
-  
+  keys_down_.insert(event.key.keysym.scancode);
+  GetSignal("key_down")->Send(event.key.keysym.scancode);
 }
 
 void SDLPlatformContext::OnKeyUp(const SDL_Event& event) {
   DCHECK(event.type == SDL_KEYUP);
+  keys_down_.erase(keys_down_.find(event.key.keysym.scancode));
+  GetSignal("key_up")->Send(event.key.keysym.scancode);
 }
 
 }  // namespace gnat

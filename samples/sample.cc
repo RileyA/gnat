@@ -34,8 +34,10 @@ class ExitListener : public gnat::Observer {
 int main(int argc, char** argv) {
   gnat::FileUtils::SetBaseFilePathFromArgv(argv);
 
-  gnat::GLPlatformContext* ctx = new gnat::SDLPlatformContext(true, false);
+  gnat::SDLPlatformContext *sdl = new gnat::SDLPlatformContext(true, true);
+  gnat::GLPlatformContext* ctx = sdl;
   ctx->InitDisplay(800, 600, false);
+  sdl->InitInput();
 
   ExitListener listen;
   ctx->GetSignal("window_closed")->AddListener(listen.GetSlot("window_closed"));
@@ -100,10 +102,12 @@ int main(int argc, char** argv) {
   gnat::ColorF32 color(0.0, 0.0, 0.0, 0.0);
 
   while(!listen.pressed()) {
-    color.r += 0.001f;
+    if (sdl->IsKeyPressed(SDL_SCANCODE_W)) {
+      color.r += 0.01f;
+    }
     gfxctx.SetClearColor(color);
-    c->SetPosition(gnat::Vector3(0, 0, color.r));
-    n->SetPosition(gnat::Vector3(-color.r * 5, 0, 0));
+    //c->SetPosition(gnat::Vector3(0, 0, color.r));
+    //n->SetPosition(gnat::Vector3(0, 0, 0));
     gfxctx.Update(0.0);
   }
 

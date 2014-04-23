@@ -10,7 +10,7 @@ class InputPlatformContext : virtual public EventHandler {
  public:
   virtual void InitInput() = 0;
   virtual void UpdateInput() = 0;
-  virtual bool IsKeyPressed() = 0;
+  virtual bool IsKeyPressed(uint32_t code) = 0;
   virtual void Deinit() = 0;
 };
 
