@@ -3,6 +3,7 @@
 #include "util/json.h"
 
 #include <ctype.h>
+#include <exception>
 
 namespace gnat {
 
@@ -24,6 +25,26 @@ Json::Value::Value(Type type, const char** string) {
   case kNull:
     *string += 3;
     break;
+  case kArray:
+    DCHECK(**string == '[');
+    ++(*string);
+    value_.array_type_ = kNull;
+    while(**string != ']') {
+      Value* value = ParseValue(string);
+      if (!value)
+        throw std::exception();
+      if (values_.empty())
+        value_.array_type_ = value->type();
+      else if (value->type() != value_.array_type_)
+        throw std::exception();
+      values_.push_back(value);
+      ++(*string);
+      if (**string == ',')
+        ++(*string);
+    }
+  case kNumber:
+    // TODO
+    break;
   }
 }
 
@@ -31,40 +52,25 @@ Json::Value::~Value() {}
 
 Json::Object::Object(const char** string)
   : Json::Value(kObject) {
-  // TODO throw exceptions or something instead of DCHECKS...
-  DCHECK(**string == '{');
+  if (**string != '{')
+    throw std::exception();
   ++(*string);
   while(**string != '}') {
-    DCHECK(**string == '"');
+    if (**string != '"')
+      throw std::exception();
     String key = ReadString(string);
-    DCHECK(**string == '"');
+    if (**string != '"')
+      throw std::exception();
     ++(*string);
-    DCHECK(**string == ':');
+    if (**string != ':')
+      throw std::exception();
     ++(*string);
 
     Value* value = ParseValue(string);
-    DCHECK(value);
+    if (!value)
+      throw std::exception();
 
     values_[key] = value;
-    ++(*string);
-    if (**string == ',')
-      ++(*string);
-  }
-}
-
-Json::Array::Array(const char** string)
-  : Json::Value(kArray) {
-  DCHECK(**string == '[');
-  ++(*string);
-  array_type_ = kNull;
-  while(**string != ']') {
-    Value* value = ParseValue(string);
-    DCHECK(value);
-    if (values_.empty())
-      array_type_ = value->type();
-    else
-      DCHECK(value->type() == array_type_);
-    values_.push_back(value);
     ++(*string);
     if (**string == ',')
       ++(*string);
@@ -113,8 +119,13 @@ Json::Object* Json::Parse(String text) {
   if (*position != '{')
     return NULL;
 
-  // Parse the main object
-  Json::Object* obj = new Json::Object(&position);
+  Json::Object* obj;
+  try {
+    // Parse the main object
+    obj = new Json::Object(&position);
+  } catch(std::exception e) {
+    return NULL;
+  }
   
   // If we had more content afterwards we're invalid.
   if (*position != '}') {
@@ -133,7 +144,7 @@ Json::Value* Json::ParseValue(const char** string) {
     value = new Object(string);
     break;
   case '[':
-    value = new Array(string);
+    value = new Value(kArray, string);
     break;
   case '"':
     value = new Value(kString, string);
@@ -143,7 +154,7 @@ Json::Value* Json::ParseValue(const char** string) {
         *(*string + 2) != 'l' ||
         *(*string + 3) != 's' ||
         *(*string + 4) != 'e') {
-      value = NULL;
+      throw std::exception();
     } else {
       value = new Value(kBoolean, string);
     }
@@ -152,7 +163,7 @@ Json::Value* Json::ParseValue(const char** string) {
     if (*(*string + 1) != 'r' || 
         *(*string + 2) != 'u' ||
         *(*string + 3) != 'e') {
-      value = NULL;
+      throw std::exception();
     } else {
       value = new Value(kBoolean, string);
     }
@@ -161,7 +172,7 @@ Json::Value* Json::ParseValue(const char** string) {
     if (*(*string + 1) != 'u' || 
         *(*string + 2) != 'l' ||
         *(*string + 3) != 'l')
-      value = NULL;
+      throw std::exception();
     else
       value = new Value(kNull, string);
     break;
@@ -170,7 +181,7 @@ Json::Value* Json::ParseValue(const char** string) {
     if (**string == '-' || (**string >= '0' && **string <= '9'))
       value = new Value(kNumber, string);
     else
-      NOTREACHED();
+      throw std::exception();
     break;
   }
   return value;

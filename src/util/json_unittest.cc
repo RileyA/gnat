@@ -48,4 +48,10 @@ namespace gnat {
     EXPECT_EQ(0, strcmp("bar", (*obj)["abc"][1]));
     delete obj;
   }
+
+  TEST(JsonTest, ReadInvalid) {
+    String str = "{\"abc\" : [\"foo\",\"bar\", false]}";
+    Json::Object* obj = Json::Parse(str);
+    EXPECT_FALSE(obj);
+  }
 }

@@ -25,11 +25,17 @@ class Json {
     Type type() { return type_; }
 
     virtual Value& operator[](int idx) {
+      if (type_ == kArray) {
+        DCHECK(idx >= 0 && idx < values_.size());
+        return *values_[idx];
+      }
       NOTREACHED();
       return *this;
     }
 
     virtual size_t NumElements() {
+      if (type_ == kArray)
+        return values_.size();
       NOTREACHED();
       return 0;
     }
@@ -54,8 +60,12 @@ class Json {
       bool b;
       int i;
       double d;
+      Type array_type_;
     } value_;
     String s;
+    Vector<Value*> values_;
+
+    friend class Json;
   };
 
   class Object : public Value {
@@ -70,19 +80,7 @@ class Json {
     }
    private:
     Map<String, Value*> values_;
-  };
-
-  class Array : public Value {
-   public:
-    Array(const char** string);
-    virtual size_t NumElements() { return values_.size(); }
-    Type array_type() { return array_type_; }
-    Value& operator[](int idx) {
-      return *(values_[idx]);
-    }
-    Vector<Value*> values_;
-   private:
-    Type array_type_;
+    friend class Json;
   };
 
   static String RemoveWhitespace(String in);
