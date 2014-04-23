@@ -7,77 +7,229 @@
 
 namespace gnat {
 
-Json::Value::Value(Json::Type type) : type_(type) {}
+const char** safe_increment(const char** string) {
+  ++(*string);
+  if (**string == '\0')
+    throw std::exception();
+}
+//---------------------------------------------------------------------------
 
-Json::Value::Value(Type type, const char** string) {
+void safe_match(String match, const char** string) {
+  for (int i = 0; i < match.size(); ++i) {
+    if (i != 0) safe_increment(string);
+    if (match[i] != **string) throw std::exception();
+  }
+}
+//---------------------------------------------------------------------------
+
+JsonValue* JsonValue::Parse(String text) {
+  text = RemoveWhitespace(text);
+  const char* position = text.c_str();
+
+  // Assume a json file always contains a top-level object.
+  if (*position != '{')
+    return NULL;
+
+  JsonValue* out = ParseValue(&position);
+
+  // If we had more content afterwards, we're invalid.
+  if (out && *position != '}') {
+    delete out;
+    return NULL;
+  }
+
+  return out;
+}
+//---------------------------------------------------------------------------
+
+JsonValue::~JsonValue() {
+  if (type_ == kObject) {
+    for (Map<String, JsonValue *>::iterator it = entries_.begin();
+         it != entries_.end(); ++it)
+      delete it->second;
+  } else if (type_ == kArray) {
+    for (int i = 0; i < v.size(); ++i)
+      delete v[i];
+  }
+}
+//---------------------------------------------------------------------------
+
+JsonValue& JsonValue::operator[](int idx) {
+  if (type_ == kArray) {
+    DCHECK(idx >= 0 && idx < v.size());
+    return *v[idx];
+  }
+  NOTREACHED(); return *this;
+}
+//---------------------------------------------------------------------------
+
+JsonValue& JsonValue::operator[](String key) {
+  if (type_ == kObject)
+    return *(entries_[key]);
+  NOTREACHED(); return *this;
+}
+//---------------------------------------------------------------------------
+
+JsonValue& JsonValue::operator[](const char* key) {
+  if (type_ == kObject)
+    return *(entries_[String(key)]);
+  NOTREACHED(); return *this;
+}
+//---------------------------------------------------------------------------
+
+JsonValue::operator bool() const {
+  if (type_ == kNull)
+    return false;
+  if (type_ == kBoolean)
+    return data_.b;
+  NOTREACHED(); return false;
+}
+//---------------------------------------------------------------------------
+
+JsonValue::operator const char*() const {
+  if (type_ == kString)
+    return &s[0];
+  NOTREACHED(); return NULL;
+}
+//---------------------------------------------------------------------------
+
+size_t JsonValue::size() {
+  if (type_ == kArray)
+    return v.size();
+  if (type_ == kObject)
+    return entries_.size();
+  NOTREACHED(); return 0;
+}
+//---------------------------------------------------------------------------
+
+JsonValue::JsonValue(Type type, const char** string) {
   type_ = type;
   switch (type) {
   case kBoolean:
-    value_.b = (**string == 't');
-    if (value_.b)
-      *string += 3;
-    else
-      *string += 4;
+    ParseBoolean(string);
     break;
   case kString:
-    s = ReadString(string);
+    ParseString(string);
     break;
   case kNull:
-    *string += 3;
+    ParseNull(string);
     break;
   case kArray:
-    DCHECK(**string == '[');
-    ++(*string);
-    value_.array_type_ = kNull;
-    while(**string != ']') {
-      Value* value = ParseValue(string);
-      if (!value)
-        throw std::exception();
-      if (values_.empty())
-        value_.array_type_ = value->type();
-      else if (value->type() != value_.array_type_)
-        throw std::exception();
-      values_.push_back(value);
-      ++(*string);
-      if (**string == ',')
-        ++(*string);
-    }
+    ParseArray(string);
+    break;
+  case kObject:
+    ParseObject(string);
+    break;
   case kNumber:
-    // TODO
+    ParseNumber(string);
     break;
   }
 }
+//---------------------------------------------------------------------------
 
-Json::Value::~Value() {}
-
-Json::Object::Object(const char** string)
-  : Json::Value(kObject) {
-  if (**string != '{')
-    throw std::exception();
-  ++(*string);
+void JsonValue::ParseObject(const char** string) {
+  if (**string != '{') throw std::exception();
+  safe_increment(string);
   while(**string != '}') {
-    if (**string != '"')
-      throw std::exception();
+    if (**string != '"') throw std::exception();
     String key = ReadString(string);
-    if (**string != '"')
-      throw std::exception();
-    ++(*string);
-    if (**string != ':')
-      throw std::exception();
-    ++(*string);
+    if (**string != '"') throw std::exception();
+    safe_increment(string);
+    if (**string != ':') throw std::exception();
+    safe_increment(string);
+    JsonValue* value = ParseValue(string);
+    if (!value) throw std::exception();
+    entries_[key] = value;
+    safe_increment(string);
+    if (**string == ',')
+      safe_increment(string);
+  }
+  if (**string != '}') throw std::exception();
+}
+//---------------------------------------------------------------------------
 
-    Value* value = ParseValue(string);
+void JsonValue::ParseArray(const char** string) {
+  DCHECK(**string == '[');
+  safe_increment(string);
+  data_.a = kNull;
+  while(**string != ']') {
+    JsonValue* value = ParseValue(string);
     if (!value)
       throw std::exception();
-
-    values_[key] = value;
-    ++(*string);
+    if (v.empty())
+      data_.a = value->type();
+    else if (value->type() != data_.a)
+      throw std::exception();
+    v.push_back(value);
+    safe_increment(string);
     if (**string == ',')
-      ++(*string);
+      safe_increment(string);
   }
+  if (**string != ']') throw std::exception();
 }
+//---------------------------------------------------------------------------
 
-String Json::RemoveWhitespace(String in) {
+void JsonValue::ParseBoolean(const char** string) {
+  data_.b = (**string == 't');
+  if (data_.b)
+    safe_match("true", string);
+  else
+    safe_match("false", string);
+}
+//---------------------------------------------------------------------------
+
+void JsonValue::ParseNull(const char** string) {
+  safe_match("null", string);
+}
+//---------------------------------------------------------------------------
+
+void JsonValue::ParseString(const char** string) {
+  s = ReadString(string);
+}
+//---------------------------------------------------------------------------
+
+void JsonValue::ParseNumber(const char** string) {
+  // TODO make this more robust
+  data_.d = atof(*string);
+  while(**string != ',' && **string != ']', **string != '}')
+    safe_increment(string);
+}
+//---------------------------------------------------------------------------
+
+JsonValue* JsonValue::ParseValue(const char** string) {
+  JsonValue* value = NULL;
+  try {
+    switch (**string) {
+    case '{':
+      value = new JsonValue(kObject, string);
+      break;
+    case '[':
+      value = new JsonValue(kArray, string);
+      break;
+    case '"':
+      value = new JsonValue(kString, string);
+      break;
+    case 'f':
+      value = new JsonValue(kBoolean, string);
+      break;
+    case 't':
+      value = new JsonValue(kBoolean, string);
+      break;
+    case 'n':
+      value = new JsonValue(kNull, string);
+      break;
+    default:
+      value = new JsonValue(kNumber, string);
+      break;
+    }
+  } catch(std::exception e) {
+    value = NULL;
+  }
+  return value;
+}
+//---------------------------------------------------------------------------
+
+String JsonValue::RemoveWhitespace(String in) {
   bool saw_quote = false;
   String out = "";
   for (int i = 0; i < in.size(); ++i) {
@@ -95,97 +247,23 @@ String Json::RemoveWhitespace(String in) {
   }
   return out;
 }
+//---------------------------------------------------------------------------
 
-String Json::ReadString(const char** string) {
-  DCHECK(**string == '"');
+String JsonValue::ReadString(const char** string) {
+  if (**string == '\0' || **string != '"') throw std::exception();
   String out = "";
-  ++(*string);
+  safe_increment(string);
   while (**string != '"') {
     if (**string == '\\') {
       out.push_back(**string);
-      ++(*string);
+      safe_increment(string);
     }
     out.push_back(**string);
-    ++(*string);
+    safe_increment(string);
   }
   return out;
 }
-
-Json::Object* Json::Parse(String text) {
-  text = RemoveWhitespace(text);
-  const char* position = text.c_str();
-
-  // Assume a json file always contains a top-level object.
-  if (*position != '{')
-    return NULL;
-
-  Json::Object* obj;
-  try {
-    // Parse the main object
-    obj = new Json::Object(&position);
-  } catch(std::exception e) {
-    return NULL;
-  }
-  
-  // If we had more content afterwards we're invalid.
-  if (*position != '}') {
-    delete obj;
-    return NULL;
-  }
-
-  return obj;
-}
-
-Json::Value* Json::ParseValue(const char** string) {
-  Json::Value* value = NULL;
-  // Now for the value
-  switch (**string) {
-  case '{':
-    value = new Object(string);
-    break;
-  case '[':
-    value = new Value(kArray, string);
-    break;
-  case '"':
-    value = new Value(kString, string);
-    break;
-  case 'f':
-    if (*(*string + 1) != 'a' || 
-        *(*string + 2) != 'l' ||
-        *(*string + 3) != 's' ||
-        *(*string + 4) != 'e') {
-      throw std::exception();
-    } else {
-      value = new Value(kBoolean, string);
-    }
-    break;
-  case 't':
-    if (*(*string + 1) != 'r' || 
-        *(*string + 2) != 'u' ||
-        *(*string + 3) != 'e') {
-      throw std::exception();
-    } else {
-      value = new Value(kBoolean, string);
-    }
-    break;
-  case 'n':
-    if (*(*string + 1) != 'u' || 
-        *(*string + 2) != 'l' ||
-        *(*string + 3) != 'l')
-      throw std::exception();
-    else
-      value = new Value(kNull, string);
-    break;
-  default:
-    // number
-    if (**string == '-' || (**string >= '0' && **string <= '9'))
-      value = new Value(kNumber, string);
-    else
-      throw std::exception();
-    break;
-  }
-  return value;
-}
+//---------------------------------------------------------------------------
 
 }
 
