@@ -38,6 +38,8 @@ class SDLPlatformContext : public InputPlatformContext,
   void OnKeyDown(const SDL_Event& event);
   void OnKeyUp(const SDL_Event& event);
 
+  void OnMouseMove(const SDL_Event& event);
+
   SDL_Window* window_;
   SDL_GLContext context_;
 

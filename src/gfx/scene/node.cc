@@ -117,7 +117,7 @@ void Node::SetOrientation(const Quaternion& orientation) {
 //---------------------------------------------------------------------------
 
 Matrix4 Node::GetTransform() {
-  if (transform_dirty_)
+  //if (transform_dirty_)
     ComputeTransform();
   return transform_;
 }
@@ -137,6 +137,10 @@ void Node::ComputeTransform() {
   transform_.SetTrans(position_);
   if (parent_)
     transform_ = parent_->GetTransform() * transform_;
+  for (List<Node*>::iterator it = children_.begin(); it != children_.end();
+       ++it) {
+    (*it)->transform_dirty_ = true;
+  }
   transform_dirty_ = false;
 }
 //---------------------------------------------------------------------------

@@ -3,6 +3,7 @@
 #include "platform/sdl/sdl_platform_context.h"
 #include "gfx/graphics_context.h"
 #include "gfx/util/mesh_data.h"
+#include "gfx/math/quaternion.h"
 #include "gfx/scene/mesh.h"
 #include "gfx/scene/mesh_drawable.h"
 #include "gfx/scene/node.h"
@@ -31,6 +32,38 @@ class ExitListener : public gnat::Observer {
   bool pressed_;
 };
 
+class FPSCamera : public gnat::EventHandler {
+ public:
+  FPSCamera() {
+    CreateSlot("mouse_moved", this, &FPSCamera::MouseMoved);
+    position_.AddChild(&yaw_);
+    yaw_.AddChild(&pitch_);
+    pitch_.AddChild(&roll_);
+    roll_.AddChild(&camera_);
+  }
+
+  void MouseMoved(const gnat::Message& m) {
+    gnat::Vector3 move = gnat::message_cast<gnat::Vector3>(m);
+
+    y += 0.002 * move.x;
+    p += 0.002 * move.y;
+
+    gnat::Quaternion q = gnat::Quaternion::IDENTITY;
+    q.FromAngleAxis(y, gnat::Vector3(0, 1, 0));
+    yaw_.SetOrientation(q);
+    q.FromAngleAxis(p, gnat::Vector3(1, 0, 0));
+    pitch_.SetOrientation(q);
+  }
+
+  float y;
+  float p;
+  gnat::Camera camera_;
+  gnat::Node position_;
+  gnat::Node yaw_;
+  gnat::Node pitch_;
+  gnat::Node roll_;
+};
+
 int main(int argc, char** argv) {
   gnat::FileUtils::SetBaseFilePathFromArgv(argv);
 
@@ -39,15 +72,18 @@ int main(int argc, char** argv) {
   ctx->InitDisplay(800, 600, false);
   sdl->InitInput();
 
+  FPSCamera* camera = new FPSCamera();
+
   ExitListener listen;
   ctx->GetSignal("window_closed")->AddListener(listen.GetSlot("window_closed"));
+  sdl->GetSignal("mouse_move")->AddListener(camera->GetSlot("mouse_moved"));
 
   gnat::GraphicsContext gfxctx(ctx);
   gfxctx.Init();
 
-  gnat::Camera* c = new gnat::Camera();
-
-  gfxctx.SetMainCamera(c);
+  camera->y = 0.0;
+  camera->p = 0.0;
+  gfxctx.SetMainCamera(&camera->camera_);
 
   gnat::MeshData d;
   d.AddAttribute("position", 3, GL_FLOAT);
@@ -106,7 +142,7 @@ int main(int argc, char** argv) {
       color.r += 0.01f;
     }
     gfxctx.SetClearColor(color);
-    //c->SetPosition(gnat::Vector3(0, 0, color.r));
+    camera->camera_.SetPosition(gnat::Vector3(0, 0, 0.0));
     //n->SetPosition(gnat::Vector3(0, 0, 0));
     gfxctx.Update(0.0);
   }

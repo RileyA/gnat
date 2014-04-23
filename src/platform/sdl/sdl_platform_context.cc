@@ -1,6 +1,7 @@
 #include "sdl_platform_context.h"
 
 #include "event/signal.h"
+#include "gfx/math/vector3.h"
 
 #include <iostream>
 
@@ -89,6 +90,7 @@ long SDLPlatformContext::GetWindowHandle() {
 void SDLPlatformContext::InitInput() {
   CreateSignal("key_down");
   CreateSignal("key_up");
+  CreateSignal("mouse_move");
 }
 
 void SDLPlatformContext::UpdateInput() {
@@ -122,6 +124,10 @@ void SDLPlatformContext::HandleEvents() {
         if (input_context_)
           OnKeyUp(event);
         break;
+      case SDL_MOUSEMOTION:
+        if (input_context_)
+          OnMouseMove(event);
+        break;
     }
   }
 }
@@ -136,6 +142,11 @@ void SDLPlatformContext::OnKeyUp(const SDL_Event& event) {
   DCHECK(event.type == SDL_KEYUP);
   keys_down_.erase(keys_down_.find(event.key.keysym.scancode));
   GetSignal("key_up")->Send(event.key.keysym.scancode);
+}
+
+void SDLPlatformContext::OnMouseMove(const SDL_Event& event) {
+  Vector3 motion = Vector3(event.motion.xrel, event.motion.yrel, 0.0);
+  GetSignal("mouse_move")->Send(motion);
 }
 
 }  // namespace gnat
