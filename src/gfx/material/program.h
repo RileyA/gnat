@@ -9,6 +9,15 @@ namespace gnat {
 
 class Program {
  public:
+
+  // Uniforms that the engine will populate magically.
+  enum AutoUniformType {
+    WORLD_MATRIX,
+    VIEW_MATRIX,
+    PROJECTION_MATRIX,
+    MVP_MATRIX,
+  };
+
   Program(VertexShader* vs, FragmentShader* fs);
   ~Program();
 
@@ -16,9 +25,15 @@ class Program {
   bool IsReady() { return ready_; }
 
   void RegisterVertexAttribute(String name);
+  void RegisterAutoUniform(String name, AutoUniformType uniform);
+  void RegisterUniform(String name);
 
   Vector<std::pair<String, GLuint> >& GetVertexAttributes() {
     return vertex_attribs_;
+  }
+
+  Map<AutoUniformType, GLuint>& GetAutoUniforms() {
+    return auto_uniforms_;
   }
 
   GLuint handle() { return handle_; }
@@ -32,6 +47,9 @@ class Program {
   FragmentShader* fs_;
   GLuint handle_;
   bool ready_;
+
+  Map<AutoUniformType, GLuint> auto_uniforms_;
+  Map<String, GLuint> uniforms_;
 
   Vector<std::pair<String, GLuint> > vertex_attribs_;
 };

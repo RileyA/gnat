@@ -19,6 +19,9 @@ class SceneManager : public Node::Visitor {
 
   void Draw(Node* root, Camera* camera);
 
+  void ConfigureMaterial(Material* material, Camera* camera);
+  void ConfigureDrawable(Drawable* draw, Camera* camera);
+
  private:
 
   virtual void Visit(Node* n);

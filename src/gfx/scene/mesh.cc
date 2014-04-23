@@ -46,10 +46,6 @@ void Mesh::Draw(Material* material) {
         glVertexAttribPointer(attribs[i].second, attr.size, attr.type, false,
                               stride_, BUFFER_OFFSET(attr.offset));
         glEnableVertexAttribArray(attribs[i].second);
-        printf(
-            "%s| idx: %d, size: %d, type: %d, norm: %d, stride: %d, offset: %p;\n",
-            attr.name.c_str(), attribs[i].second, attr.size, attr.type, false, stride_,
-            BUFFER_OFFSET(attr.offset));
       }
     }
   }

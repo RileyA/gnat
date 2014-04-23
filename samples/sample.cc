@@ -51,16 +51,16 @@ int main(int argc, char** argv) {
   d.AddAttribute("position", 3, GL_FLOAT);
   d.AddAttribute("normal", 3, GL_FLOAT);
   d.Start(4, 6);
-  d.Append<gnat::Vector3>(gnat::Vector3(-1.0,  1.0, 0.0)); // UL
+  d.Append<gnat::Vector3>(gnat::Vector3(-1.0,  1.0, -2.5)); // UL
   d.Append<gnat::Vector3>(gnat::Vector3( 0.0,  1.0, 0.0));
   d.FinishVertex();
-  d.Append<gnat::Vector3>(gnat::Vector3(-1.0, -1.0, 0.0)); // LL
+  d.Append<gnat::Vector3>(gnat::Vector3(-1.0, -1.0, -2.5)); // LL
   d.Append<gnat::Vector3>(gnat::Vector3( 1.0,  0.0, 0.0));
   d.FinishVertex();
-  d.Append<gnat::Vector3>(gnat::Vector3( 1.0, -1.0, 0.0)); // LR
+  d.Append<gnat::Vector3>(gnat::Vector3( 1.0, -1.0, -2.5)); // LR
   d.Append<gnat::Vector3>(gnat::Vector3( 0.0,  0.0, 1.0));
   d.FinishVertex();
-  d.Append<gnat::Vector3>(gnat::Vector3( 1.0,  1.0, 0.0)); // LR
+  d.Append<gnat::Vector3>(gnat::Vector3( 1.0,  1.0, -2.5)); // UR
   d.Append<gnat::Vector3>(gnat::Vector3( 0.0,  0.5, 0.5));
   d.FinishVertex();
   d.AddTriangle(0, 1, 2);
@@ -86,6 +86,10 @@ int main(int argc, char** argv) {
   program->Link();
   program->RegisterVertexAttribute("position");
   program->RegisterVertexAttribute("normal");
+  program->RegisterAutoUniform("p", gnat::Program::PROJECTION_MATRIX);
+  program->RegisterAutoUniform("v", gnat::Program::VIEW_MATRIX);
+  program->RegisterAutoUniform("m", gnat::Program::WORLD_MATRIX);
+  program->RegisterAutoUniform("mvp", gnat::Program::MVP_MATRIX);
   mat->set_shader(program);
 
   md->SetMaterial(mat);
@@ -98,6 +102,8 @@ int main(int argc, char** argv) {
   while(!listen.pressed()) {
     color.r += 0.001f;
     gfxctx.SetClearColor(color);
+    c->SetPosition(gnat::Vector3(0, 0, color.r));
+    n->SetPosition(gnat::Vector3(-color.r * 5, 0, 0));
     gfxctx.Update(0.0);
   }
 

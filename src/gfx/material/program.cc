@@ -58,4 +58,21 @@ void Program::RegisterVertexAttribute(String name) {
 }
 //-----------------------------------------------------------------------
 
+void Program::RegisterAutoUniform(String name, AutoUniformType uniform) {
+  DCHECK(ready_);
+  GLuint addr = glGetUniformLocation(handle_, name.c_str());
+  DCHECK(glGetError() == GL_NO_ERROR);
+  uniforms_[name] = addr;
+  auto_uniforms_[uniform] = addr;
+}
+//-----------------------------------------------------------------------
+
+void Program::RegisterUniform(String name) {
+  DCHECK(ready_);
+  GLuint addr = glGetUniformLocation(handle_, name.c_str());
+  DCHECK(glGetError() == GL_NO_ERROR);
+  uniforms_[name] = addr;
+}
+//-----------------------------------------------------------------------
+
 }  // namespace gnat

@@ -13,6 +13,20 @@ class Camera : public Node {
  public:
   Camera();
   virtual ~Camera();
+
+  Matrix4 GetProjectionMatrix();
+  Matrix4 GetViewMatrix();
+
+  void SetCameraParams(float fov_y, float near_z, float far_z, float aspect_ratio);
+
+ private:
+
+  float fov_y_;
+  float near_z_;
+  float far_z_;
+  float aspect_ratio_;
+
+  Matrix4 projection_;
 };
 
 }  // namespace gnat
