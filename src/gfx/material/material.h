@@ -19,6 +19,8 @@ class Material {
 
   void set_shader(Program* p) { shader_program_ = p; }
 
+  Program* shader_program() { return shader_program_; }
+
  private:
   String name_;
   bool using_;

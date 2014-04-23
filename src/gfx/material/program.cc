@@ -30,7 +30,7 @@ Program::~Program() {
 
 bool Program::Link() {
   DCHECK(vs_ && fs_ && vs_->IsReady() && fs_->IsReady());
-  GLuint handle_ = glCreateProgram();
+  handle_ = glCreateProgram();
   glAttachShader(handle_, vs_->handle());
   glAttachShader(handle_, fs_->handle());
   glLinkProgram(handle_);
@@ -47,6 +47,14 @@ bool Program::Link() {
   }
 
   return ready_;
+}
+//-----------------------------------------------------------------------
+
+void Program::RegisterVertexAttribute(String name) {
+  DCHECK(ready_);
+  GLuint addr = glGetAttribLocation(handle_, name.c_str());
+  DCHECK(glGetError() == GL_NO_ERROR);
+  vertex_attribs_.push_back(std::make_pair(name, addr));
 }
 //-----------------------------------------------------------------------
 

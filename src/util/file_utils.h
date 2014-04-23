@@ -10,6 +10,7 @@ extern String BASE_FILE_PATH;
 class FileUtils {
  public:
   static bool ReadFile(String filename, String* out);
+  static String ReadFile(String filename);
   static void SetBaseFilePath(String path);
   static void SetBaseFilePathFromArgv(char** argv);
   static const String& GetBaseFilePath() { return BASE_FILE_PATH; }

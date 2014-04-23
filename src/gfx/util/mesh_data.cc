@@ -2,44 +2,61 @@
 
 namespace gnat {
 
-void MeshData::AddPosition(Vector3 p) {
-  positions_.push_back(p.x);
-  positions_.push_back(p.y);
-  positions_.push_back(p.z);
+size_t gl_sizeof(GLenum type) {
+  switch (type) {
+  case GL_FLOAT:
+    return sizeof(float);
+  default:
+    NOTREACHED();
+    return 0;
+  }
+}
+
+MeshData::MeshData()
+  : started_(false),
+    current_vertex_(0),
+    num_verts_(0),
+    stride_(0) {}
+//---------------------------------------------------------------------------
+
+MeshData::~MeshData() {}
+//---------------------------------------------------------------------------
+
+void MeshData::AddAttribute(String name, uint32_t size, GLenum type) {
+  DCHECK(!started_);
+  Attribute attr = { name, stride_, size, type };
+  attributes_.push_back(attr);
+  stride_ += size * gl_sizeof(type);
 }
 //---------------------------------------------------------------------------
 
-void MeshData::AddNormal(Vector3 n) {
-  normals_.push_back(n.x);
-  normals_.push_back(n.y);
-  normals_.push_back(n.z);
+void MeshData::Start(size_t num_verts, size_t num_indices) {
+  DCHECK(!started_);
+  data_.reserve(num_verts * stride_);
+  indices_.reserve(num_indices);
+  started_ = true;
 }
 //---------------------------------------------------------------------------
 
-void MeshData::AddDiffuse(ColorF32 c) {
-  diffuse_.push_back(c.r);
-  diffuse_.push_back(c.g);
-  diffuse_.push_back(c.b);
-  diffuse_.push_back(c.a);
+void MeshData::AppendVertices(void* buf, size_t num_verts) {
+  DCHECK(started_);
+  AppendData(buf, num_verts_ * stride_);
 }
 //---------------------------------------------------------------------------
 
-void MeshData::AddTexcoordSet() {
-  texcoords_.push_back(Vector<float>());
+void MeshData::FinishVertex() {
+  DCHECK(started_);
+  DCHECK(current_vertex_ == stride_);
+  current_vertex_ = 0;
+  ++num_verts_;
 }
 //---------------------------------------------------------------------------
 
-void MeshData::AddTexcoord(uint32_t index, float u, float v) {
-  DCHECK(texcoords_.size() > index && index > 0);
-  texcoords_[index].push_back(u);
-  texcoords_[index].push_back(v);
-}
-//---------------------------------------------------------------------------
-
-void MeshData::AddTexcoord(uint32_t index, float u, float v, float w) {
-  texcoords_[index].push_back(u);
-  texcoords_[index].push_back(v);
-  texcoords_[index].push_back(w);
+void MeshData::AppendData(void* buffer, size_t size) {
+  DCHECK(started_);
+  size_t idx = data_.size();
+  data_.resize(data_.size() + size);
+  memcpy(reinterpret_cast<void*>(&data_[idx]), buffer, size);
 }
 //---------------------------------------------------------------------------
 
@@ -55,27 +72,4 @@ void MeshData::AddTriangle(uint32_t v1, uint32_t v2, uint32_t v3) {
 }
 //---------------------------------------------------------------------------
   
-bool MeshData::IsValid() {
-  int num_verts = positions_.size() / 3;
-  if (positions_.size() % 3 != 0)
-    return false;
-  if (HasNormals() && normals_.size() != num_verts * 3)
-    return false;
-  if (HasDiffuse() && diffuse_.size() != num_verts)
-    return false;
-  return true;
-}
-//---------------------------------------------------------------------------
-
-// Size of vertices not counting indices.
-size_t MeshData::size() {
-  DCHECK(IsValid());
-  size_t out = 0;
-  out += positions_.size() * sizeof(float);
-  out += normals_.size() * sizeof(float);
-  out += diffuse_.size() * sizeof(uint8_t);  // we'll round to 8bit
-  return out;
-}
-//---------------------------------------------------------------------------
-
 }  // namespace gnat

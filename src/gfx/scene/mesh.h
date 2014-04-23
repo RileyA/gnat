@@ -9,13 +9,15 @@
 
 namespace gnat {
 
+class Material;
+
 class Mesh {
  public:
 
   Mesh(MeshData* mesh);
   virtual ~Mesh() {}
 
-  void Draw();
+  void Draw(Material* material);
 
  private:
 
@@ -24,12 +26,11 @@ class Mesh {
   VertexBufferObject vbo_;
   IndexBufferObject ibo_;
 
-  int num_verts_;
-  int num_indices_;
-  bool normals_;
-  bool diffuse_;
+  Map<String, MeshData::Attribute> attributes_;
   uint32_t stride_;
 
+  uint32_t num_indices_;
+  uint32_t num_verts_;
 };
 
 }  // namespace gnat

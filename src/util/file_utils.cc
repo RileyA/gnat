@@ -18,6 +18,13 @@ bool FileUtils::ReadFile(String filename, String* out) {
   return true;
 }
 
+String FileUtils::ReadFile(String filename) {
+  std::ifstream file(filename.c_str());
+  DCHECK(file.good());
+  return String((std::istreambuf_iterator<char>(file)),
+                std::istreambuf_iterator<char>());
+}
+
 void FileUtils::SetBaseFilePath(String path) {
   BASE_FILE_PATH = path;
 }

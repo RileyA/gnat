@@ -9,6 +9,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cmath>
+#include <cstring>
 
 // TODO: <cstdint>?
 #include <inttypes.h>

@@ -41,6 +41,9 @@ SDLPlatformContext::~SDLPlatformContext() {}
 void SDLPlatformContext::InitDisplay(size_t w, size_t h, bool fullscreen) {
   DCHECK(gl_context_);
 
+  width_ = w;
+  height_ = h;
+
   // TODO: GL version handling stuffs
   SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
   SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);

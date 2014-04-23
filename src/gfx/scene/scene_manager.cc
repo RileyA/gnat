@@ -1,5 +1,6 @@
 #include "gfx/scene/scene_manager.h"
 
+#include "gfx/material/material.h"
 #include "gfx/scene/camera.h"
 #include "gfx/scene/drawable.h"
 
@@ -22,9 +23,11 @@ void SceneManager::Draw(Node* root, Camera* camera) {
   
   // execute the draws
   for (DrawMap::iterator i = draws_.begin(); i != draws_.end(); ++i) {
+    i->first->Use();
     for (DrawQueue::iterator j = i->second.begin(); j != i->second.end(); ++j) {
       (*j)->Draw();
     }
+    i->first->DoneUsing();
   }
 
   // and clean up (TODO: maybe persist this structure and invalidate it as we go?)
