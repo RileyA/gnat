@@ -59,6 +59,8 @@ set(GNAT_FILES
   util/color.h
   util/file_utils.cc
   util/file_utils.h
+  util/json.cc
+  util/json.h
   util/logger.cc
   util/logger.h
   util/string_utils.cc
@@ -103,6 +105,7 @@ set(TEST_FILES
 
   util/color_unittest.cc
   util/file_utils_unittest.cc
+  util/json_unittest.cc
   util/string_utils_unittest.cc
 	)
 
