@@ -25,6 +25,8 @@ Program::Program(VertexShader* vs, FragmentShader* fs)
 Program::~Program() {
   if (ready_)
     glDeleteProgram(handle_);
+  delete vs_;
+  delete fs_;
 }
 //-----------------------------------------------------------------------
 
@@ -64,6 +66,22 @@ void Program::RegisterAutoUniform(String name, AutoUniformType uniform) {
   DCHECK(glGetError() == GL_NO_ERROR);
   uniforms_[name] = addr;
   auto_uniforms_[uniform] = addr;
+}
+//-----------------------------------------------------------------------
+
+void Program::RegisterAutoUniform(String name, String uniform) {
+  AutoUniformType type;
+  if (uniform == "MVP_MATRIX")
+    type = MVP_MATRIX;
+  else if (uniform == "WORLD_MATRIX")
+    type = WORLD_MATRIX;
+  else if (uniform == "VIEW_MATRIX")
+    type = VIEW_MATRIX;
+  else if (uniform == "PROJECTION_MATRIX")
+    type = PROJECTION_MATRIX;
+  else
+    return;
+  RegisterAutoUniform(name, type);
 }
 //-----------------------------------------------------------------------
 

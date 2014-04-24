@@ -21,6 +21,8 @@ class Material {
 
   Program* shader_program() { return shader_program_; }
 
+  static Material* FromFile(String filename);
+
  private:
   String name_;
   bool using_;

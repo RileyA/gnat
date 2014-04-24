@@ -77,24 +77,8 @@ class TestState : public GameState {
     Node* n = new Node();
     n->AddDrawable(md);
 
-    Material* mat = new Material("test");
-    VertexShader *vs = new VertexShader(
-        "testvs", FileUtils::ReadFile(FileUtils::GetBaseFilePath() +
-                                            "../data/materials/vs.glsl"));
-    FragmentShader *fs = new FragmentShader(
-        "testfs", FileUtils::ReadFile(FileUtils::GetBaseFilePath() +
-                                            "../data/materials/fs.glsl"));
-    vs->Compile();
-    fs->Compile();
-    Program* program = new Program(vs, fs);
-    program->Link();
-    program->RegisterVertexAttribute("position");
-    program->RegisterVertexAttribute("normal");
-    //program->RegisterAutoUniform("p", Program::PROJECTION_MATRIX);
-    //program->RegisterAutoUniform("v", Program::VIEW_MATRIX);
-    //program->RegisterAutoUniform("m", Program::WORLD_MATRIX);
-    program->RegisterAutoUniform("mvp", Program::MVP_MATRIX);
-    mat->set_shader(program);
+    Material* mat = Material::FromFile("../data/materials/test.material");
+    Program* program = mat->shader_program();
 
     md->SetMaterial(mat);
     gfx_->GetRootNode()->AddChild(n);
