@@ -1,6 +1,7 @@
 #include "event/observer.h"
 #include "event/signal.h"
 #include "platform/sdl/sdl_platform_context.h"
+#include "platform/keycodes.h"
 #include "gfx/graphics_context.h"
 #include "gfx/util/mesh_data.h"
 #include "gfx/math/quaternion.h"
@@ -13,6 +14,7 @@
 #include "gfx/material/shader.h"
 #include "gfx/scene/scene_manager.h"
 #include "util/file_utils.h"
+#include "util/timer.h"
 
 class ExitListener : public gnat::Observer {
  public:
@@ -33,92 +35,13 @@ class ExitListener : public gnat::Observer {
   bool pressed_;
 };
 
-class FPSCamera : public gnat::EventHandler {
- public:
-  FPSCamera() {
-    CreateSlot("mouse_moved", this, &FPSCamera::MouseMoved);
-    CreateSlot("key_down", this, &FPSCamera::KeyDown);
-    CreateSlot("key_up", this, &FPSCamera::KeyUp);
-    position_.AddChild(&yaw_);
-    yaw_.AddChild(&pitch_);
-    pitch_.AddChild(&roll_);
-    roll_.AddChild(&camera_);
-    w = a = s = d = false;
-  }
-
-  void MouseMoved(const gnat::Message& m) {
-    gnat::Vector3 move = gnat::message_cast<gnat::Vector3>(m);
-
-    y -= 0.002 * move.x;
-    p -= 0.002 * move.y;
-
-    gnat::Quaternion q = gnat::Quaternion::IDENTITY;
-    q.FromAngleAxis(y, gnat::Vector3(0, 1, 0));
-    yaw_.SetOrientation(q);
-    q.FromAngleAxis(p, gnat::Vector3(1, 0, 0));
-    pitch_.SetOrientation(q);
-  }
-
-  void Update() {
-    float forward = - 1 * s + 1 * w;
-    float right = - 1 * a + 1 * d;
-    if (w || s || a || d)
-      position_.SetPosition(position_.GetPosition() +
-                          GetDirection() * forward * 0.01f +
-                          GetRight() * right * 0.01f);
-    gnat::Vector3 d = GetDirection();
-    printf("Dir: %f %f %f\n", d.x, d.y, d.z);
-  }
-
-  void KeyDown(const gnat::Message& m) {
-    SDL_Scancode sc = gnat::message_cast<SDL_Scancode>(m);
-    if (sc == SDL_SCANCODE_W)
-      w = true;
-    if (sc == SDL_SCANCODE_S)
-      s = true;
-    if (sc == SDL_SCANCODE_A)
-      a = true;
-    if (sc == SDL_SCANCODE_D)
-      d = true;
-  }
-
-  void KeyUp(const gnat::Message& m) {
-    SDL_Scancode sc = gnat::message_cast<SDL_Scancode>(m);
-    if (sc == SDL_SCANCODE_W)
-      w = false;
-    if (sc == SDL_SCANCODE_S)
-      s = false;
-    if (sc == SDL_SCANCODE_A)
-      a = false;
-    if (sc == SDL_SCANCODE_D)
-      d = false;
-  }
-
-  gnat::Vector3 GetDirection() {
-    return camera_.GetTransform().ExtractQuaternion() * gnat::Vector3::NEGATIVE_UNIT_Z;
-  }
-
-  gnat::Vector3 GetRight() {
-    return camera_.GetTransform().ExtractQuaternion() * gnat::Vector3::UNIT_X;
-  }
-
-  bool w, a, s, d;
-  float y;
-  float p;
-  gnat::Camera camera_;
-  gnat::Node position_;
-  gnat::Node yaw_;
-  gnat::Node pitch_;
-  gnat::Node roll_;
-};
-
 int main(int argc, char** argv) {
   gnat::FileUtils::SetBaseFilePathFromArgv(argv);
 
   gnat::SDLPlatformContext *sdl = new gnat::SDLPlatformContext(true, true);
   gnat::GLPlatformContext* ctx = sdl;
   ctx->InitDisplay(800, 600, false);
-  sdl->InitInput();
+  sdl->InitInput(true);
 
   //FPSCamera* camera = new FPSCamera();
   gnat::FPSCamera* camera = new gnat::FPSCamera();
@@ -126,8 +49,15 @@ int main(int argc, char** argv) {
   ExitListener listen;
   ctx->GetSignal("window_closed")->AddListener(listen.GetSlot("window_closed"));
   sdl->GetSignal("mouse_move")->AddListener(camera->GetSlot("mouse_moved"));
-  sdl->GetSignal("key_down")->AddListener(camera->GetSlot("key_down"));
-  sdl->GetSignal("key_up")->AddListener(camera->GetSlot("key_up"));
+
+  sdl->GetKeyUpSignal(gnat::K_W)->AddListener(camera->GetSlot("key_up"));
+  sdl->GetKeyUpSignal(gnat::K_A)->AddListener(camera->GetSlot("key_up"));
+  sdl->GetKeyUpSignal(gnat::K_S)->AddListener(camera->GetSlot("key_up"));
+  sdl->GetKeyUpSignal(gnat::K_D)->AddListener(camera->GetSlot("key_up"));
+  sdl->GetKeyDownSignal(gnat::K_W)->AddListener(camera->GetSlot("key_down"));
+  sdl->GetKeyDownSignal(gnat::K_A)->AddListener(camera->GetSlot("key_down"));
+  sdl->GetKeyDownSignal(gnat::K_S)->AddListener(camera->GetSlot("key_down"));
+  sdl->GetKeyDownSignal(gnat::K_D)->AddListener(camera->GetSlot("key_down"));
 
   gnat::Signal* sig = new gnat::Signal();
   camera->GetSlot("tick")->ListenTo(sig);
@@ -192,9 +122,17 @@ int main(int argc, char** argv) {
   n->SetPosition(gnat::Vector3(0, 0.5, 0));
   camera->SetPosition(gnat::Vector3(0,0,2));
 
+  gnat::Timer t;
+  t.Start();
+
+  float last = t.GetTimeSeconds();
+
   while(!listen.pressed()) {
-    sig->Send(double(0.01));
-    if (sdl->IsKeyPressed(SDL_SCANCODE_W)) {
+    float now = t.GetTimeSeconds();
+    float delta = now - last;
+    last = now;
+    sig->Send(double(delta));
+    if (sdl->IsKeyPressed(gnat::K_W)) {
       color.r += 0.01f;
     }
     gfxctx.SetClearColor(color);

@@ -51,6 +51,8 @@ set(GNAT_FILES
 
   platform/gl_platform_context.h
   platform/input_platform_context.h
+  platform/keycodes.cc
+  platform/keycodes.h
   platform/platform_context.h
 
   platform/sdl/sdl_platform_context.cc

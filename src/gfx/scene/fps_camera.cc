@@ -2,7 +2,7 @@
 
 #include "gfx/scene/fps_camera.h"
 #include "event/message.h"
-#include "platform/sdl/sdl_platform_context.h"
+#include "platform/keycodes.h"
 
 namespace gnat {
 
@@ -97,17 +97,17 @@ void FPSCamera::MouseMoved(const Message& m) {
 //---------------------------------------------------------------------------
 
 void FPSCamera::KeyDown(const Message& m) {
-  switch (message_cast<SDL_Scancode>(m)) {
-    case SDL_SCANCODE_W:
+  switch (message_cast<KeyCode>(m)) {
+    case K_W:
       forward_ = true;
       break;
-    case SDL_SCANCODE_A:
+    case K_A:
       left_ = true;
       break;
-    case SDL_SCANCODE_S:
+    case K_S:
       backward_ = true;
       break;
-    case SDL_SCANCODE_D:
+    case K_D:
       right_ = true;
       break;
   }
@@ -115,17 +115,17 @@ void FPSCamera::KeyDown(const Message& m) {
 //---------------------------------------------------------------------------
 
 void FPSCamera::KeyUp(const Message& m) {
-  switch (message_cast<SDL_Scancode>(m)) {
-    case SDL_SCANCODE_W:
+  switch (message_cast<KeyCode>(m)) {
+    case K_W:
       forward_ = false;
       break;
-    case SDL_SCANCODE_A:
+    case K_A:
       left_ = false;
       break;
-    case SDL_SCANCODE_S:
+    case K_S:
       backward_ = false;
       break;
-    case SDL_SCANCODE_D:
+    case K_D:
       right_ = false;
       break;
   }
