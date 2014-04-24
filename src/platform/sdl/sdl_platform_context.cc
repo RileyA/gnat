@@ -91,6 +91,8 @@ void SDLPlatformContext::InitInput() {
   CreateSignal("key_down");
   CreateSignal("key_up");
   CreateSignal("mouse_move");
+  SDL_ShowCursor(0);
+  SDL_SetRelativeMouseMode((SDL_bool)true);
 }
 
 void SDLPlatformContext::UpdateInput() {

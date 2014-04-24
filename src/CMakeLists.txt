@@ -24,6 +24,8 @@ set(GNAT_FILES
   gfx/scene/camera.h
   gfx/scene/drawable.cc
   gfx/scene/drawable.h
+  gfx/scene/fps_camera.cc
+  gfx/scene/fps_camera.h
   gfx/scene/mesh.cc
   gfx/scene/mesh.h
   gfx/scene/mesh_drawable.cc
