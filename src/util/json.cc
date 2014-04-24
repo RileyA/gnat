@@ -204,8 +204,9 @@ void JsonValue::ParseString(const char** string) {
 void JsonValue::ParseNumber(const char** string) {
   // TODO make this more robust
   data_.d = atof(*string);
-  while(**string != ',' && **string != ']', **string != '}')
+  while(**string != ',' && **string != ']' && **string != '}')
     safe_increment(string);
+  --(*string);
 }
 //---------------------------------------------------------------------------
 

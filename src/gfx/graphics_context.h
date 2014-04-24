@@ -11,6 +11,7 @@
 namespace gnat {
 
 class GLPlatformContext;
+class Mesh;
 
 class GraphicsContext : public EventHandler {
  public:
@@ -28,9 +29,15 @@ class GraphicsContext : public EventHandler {
 
   void SetMainCamera(Camera* camera);
 
+  Mesh* LoadMesh(String filename);
+  //Texture* LoadTexture(String filename);
+
   Node* GetRootNode() { return &root_; }
 
  private:
+  
+  Map<String, Mesh*> meshes_;
+  //Map<String, Texture*> textures_;
 
   GLPlatformContext* platform_context_;
 

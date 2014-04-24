@@ -42,6 +42,16 @@ class JsonValue {
     return s;
   }
 
+  int integer() {
+    DCHECK(type_ == kNumber);
+    return round(data_.d);
+  }
+
+  double floating() {
+    DCHECK(type_ == kNumber);
+    return data_.d;
+  }
+
   static String RemoveWhitespace(String in);
   static String ReadString(const char** string);
 

@@ -28,7 +28,7 @@ void Material::DoneUsing() {
 
 // This is hacky, but I want a working format for Ludum Dare
 // TODO clean this up lotses
-Material* Material::FromFile(String filename) {
+Material* Material::FromFile(GraphicsContext* gfx, String filename) {
   String text;
   if (!FileUtils::ReadFile(FileUtils::GetBaseFilePath() + filename, &text)) {
     return NULL;
@@ -68,6 +68,8 @@ Material* Material::FromFile(String filename) {
     }
     m->set_shader(program);
 
+    glUseProgram(program->handle());
+  
     // Uniforms.
     if (j.Has("uniforms") && j["uniforms"].type() == JsonValue::kArray) {
       for (int i = 0; i < j["uniforms"].size(); ++i) {
@@ -76,14 +78,43 @@ Material* Material::FromFile(String filename) {
           continue;
         String name = u["name"].string();
         String type = u["type"].string();
+
+        // Auto set uniforms.
         if (type == "auto") {
           if (u.Has("auto"))
             program->RegisterAutoUniform("mvp", u["auto"].string());
         } else {
-          // TODO
+          float tmpf[4];
+          if (type == "int" && u.Has("value") &&
+              u["value"].type() == JsonValue::kNumber) {
+            program->SetUniform1i(name, u["value"].integer());
+          } else if (type == "float" && u.Has("value") &&
+                     u["value"].type() == JsonValue::kNumber) {
+            program->SetUniform1f(name, u["value"].floating());
+          } else if (type == "vec2" && u.Has("value") &&
+                     u["value"].type() == JsonValue::kArray &&
+                     u["value"].size() == 2) {
+            for (int i = 0; i < u["value"].size(); ++i)
+              tmpf[i] = u["value"][i].floating();
+            program->SetUniform2f(name, tmpf);
+          } else if (type == "vec3" && u.Has("value") &&
+                     u["value"].type() == JsonValue::kArray &&
+                     u["value"].size() == 3) {
+            for (int i = 0; i < u["value"].size(); ++i)
+              tmpf[i] = u["value"][i].floating();
+            program->SetUniform3f(name, tmpf);
+          } else if (type == "vec4" && u.Has("value") &&
+                     u["value"].type() == JsonValue::kArray &&
+                     u["value"].size() == 4) {
+            for (int i = 0; i < u["value"].size(); ++i)
+              tmpf[i] = u["value"][i].floating();
+            program->SetUniform4f(name, tmpf);
+          }
         }
       }
     }
+
+    glUseProgram(0);
     
     // Vertex attributes.
     if (j.Has("attributes") && j["attributes"].type() == JsonValue::kArray) {

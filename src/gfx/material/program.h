@@ -29,7 +29,13 @@ class Program {
   void RegisterVertexAttribute(String name);
   void RegisterAutoUniform(String name, AutoUniformType uniform);
   void RegisterAutoUniform(String name, String uniform);
-  void RegisterUniform(String name);
+  GLuint RegisterUniform(String name);
+
+  void SetUniform1i(String name, int i);
+  void SetUniform1f(String name, float f);
+  void SetUniform2f(String name, float* f);
+  void SetUniform3f(String name, float* f);
+  void SetUniform4f(String name, float* f);
 
   Vector<std::pair<String, GLuint> >& GetVertexAttributes() {
     return vertex_attribs_;

@@ -54,31 +54,12 @@ class TestState : public GameState {
     Signal* tick = CreateSignal("tick");
     camera_->GetSlot("tick")->ListenTo(tick);
 
-    MeshData d;
-    d.AddAttribute("position", 3, GL_FLOAT);
-    d.AddAttribute("normal", 3, GL_FLOAT);
-    d.Start(4, 6);
-    d.Append<Vector3>(Vector3(-1.0,  1.0, 0.0)); // UL
-    d.Append<Vector3>(Vector3( 0.0,  1.0, 0.0));
-    d.FinishVertex();
-    d.Append<Vector3>(Vector3(-1.0, -1.0, 0.0)); // LL
-    d.Append<Vector3>(Vector3( 1.0,  0.0, 0.0));
-    d.FinishVertex();
-    d.Append<Vector3>(Vector3( 1.0, -1.0, 0.0)); // LR
-    d.Append<Vector3>(Vector3( 0.0,  0.0, 1.0));
-    d.FinishVertex();
-    d.Append<Vector3>(Vector3( 1.0,  1.0, 0.0)); // UR
-    d.Append<Vector3>(Vector3( 0.0,  0.5, 0.5));
-    d.FinishVertex();
-    d.AddTriangle(0, 1, 2);
-    d.AddTriangle(0, 2, 3);
-    Mesh* m = new Mesh(&d);
+    Mesh* m = gfx_->LoadMesh("../data/meshes/monkey.ply");
     MeshDrawable* md = new MeshDrawable(m);
     Node* n = new Node();
     n->AddDrawable(md);
 
-    Material* mat = Material::FromFile("../data/materials/test.material");
-    Program* program = mat->shader_program();
+    Material* mat = Material::FromFile(gfx_.get(), "../data/materials/test.material");
 
     md->SetMaterial(mat);
     gfx_->GetRootNode()->AddChild(n);

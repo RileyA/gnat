@@ -6,6 +6,7 @@
 namespace gnat {
 
 class Program;
+class GraphicsContext;
 
 class Material {
  public:
@@ -21,7 +22,7 @@ class Material {
 
   Program* shader_program() { return shader_program_; }
 
-  static Material* FromFile(String filename);
+  static Material* FromFile(GraphicsContext* gfx, String filename);
 
  private:
   String name_;
