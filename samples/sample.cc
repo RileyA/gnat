@@ -15,135 +15,121 @@
 #include "gfx/scene/scene_manager.h"
 #include "util/file_utils.h"
 #include "util/timer.h"
+#include "game/game.h"
+#include "game/game_state.h"
 
-class ExitListener : public gnat::Observer {
+#include "util/scoped_ptr.h"
+
+using namespace gnat;
+
+class TestState : public GameState {
  public:
+  TestState() {}
 
-  ExitListener() {
-    CreateSlot("window_closed", this, &ExitListener::ExitPressed);
-    pressed_ = false;
+  virtual void Init(Game* game) {
+    game_ = game;
+    gfx_ = scoped_ptr<GraphicsContext>(new GraphicsContext(game_->gl()));
+    gfx_->Init();
+    camera_ = new FPSCamera();
+    gfx_->SetMainCamera(camera_->GetCamera());
+    game_->input()->GetKeyUpSignal(gnat::K_W)
+        ->AddListener(camera_->GetSlot("key_up"));
+    game_->input()->GetKeyUpSignal(gnat::K_A)
+        ->AddListener(camera_->GetSlot("key_up"));
+    game_->input()->GetKeyUpSignal(gnat::K_S)
+        ->AddListener(camera_->GetSlot("key_up"));
+    game_->input()->GetKeyUpSignal(gnat::K_D)
+        ->AddListener(camera_->GetSlot("key_up"));
+    game_->input()->GetKeyDownSignal(gnat::K_W)
+        ->AddListener(camera_->GetSlot("key_down"));
+    game_->input()->GetKeyDownSignal(gnat::K_A)
+        ->AddListener(camera_->GetSlot("key_down"));
+    game_->input()->GetKeyDownSignal(gnat::K_S)
+        ->AddListener(camera_->GetSlot("key_down"));
+    game_->input()->GetKeyDownSignal(gnat::K_D)
+        ->AddListener(camera_->GetSlot("key_down"));
+    game_->input()->GetSignal("mouse_move")
+        ->AddListener(camera_->GetSlot("mouse_moved"));
+    gfx_->SetClearColor(ColorF32(1.0, 0.3, 0.2, 1.0));
+    Signal* tick = CreateSignal("tick");
+    camera_->GetSlot("tick")->ListenTo(tick);
+
+    MeshData d;
+    d.AddAttribute("position", 3, GL_FLOAT);
+    d.AddAttribute("normal", 3, GL_FLOAT);
+    d.Start(4, 6);
+    d.Append<Vector3>(Vector3(-1.0,  1.0, 0.0)); // UL
+    d.Append<Vector3>(Vector3( 0.0,  1.0, 0.0));
+    d.FinishVertex();
+    d.Append<Vector3>(Vector3(-1.0, -1.0, 0.0)); // LL
+    d.Append<Vector3>(Vector3( 1.0,  0.0, 0.0));
+    d.FinishVertex();
+    d.Append<Vector3>(Vector3( 1.0, -1.0, 0.0)); // LR
+    d.Append<Vector3>(Vector3( 0.0,  0.0, 1.0));
+    d.FinishVertex();
+    d.Append<Vector3>(Vector3( 1.0,  1.0, 0.0)); // UR
+    d.Append<Vector3>(Vector3( 0.0,  0.5, 0.5));
+    d.FinishVertex();
+    d.AddTriangle(0, 1, 2);
+    d.AddTriangle(0, 2, 3);
+    Mesh* m = new Mesh(&d);
+    MeshDrawable* md = new MeshDrawable(m);
+    Node* n = new Node();
+    n->AddDrawable(md);
+
+    Material* mat = new Material("test");
+    VertexShader *vs = new VertexShader(
+        "testvs", FileUtils::ReadFile(FileUtils::GetBaseFilePath() +
+                                            "../data/materials/vs.glsl"));
+    FragmentShader *fs = new FragmentShader(
+        "testfs", FileUtils::ReadFile(FileUtils::GetBaseFilePath() +
+                                            "../data/materials/fs.glsl"));
+    vs->Compile();
+    fs->Compile();
+    Program* program = new Program(vs, fs);
+    program->Link();
+    program->RegisterVertexAttribute("position");
+    program->RegisterVertexAttribute("normal");
+    //program->RegisterAutoUniform("p", Program::PROJECTION_MATRIX);
+    //program->RegisterAutoUniform("v", Program::VIEW_MATRIX);
+    //program->RegisterAutoUniform("m", Program::WORLD_MATRIX);
+    program->RegisterAutoUniform("mvp", Program::MVP_MATRIX);
+    mat->set_shader(program);
+
+    md->SetMaterial(mat);
+    gfx_->GetRootNode()->AddChild(n);
+
+    n->SetPosition(Vector3(0, 0.5, 0));
+    camera_->SetPosition(Vector3(0,0,2));
   }
 
-  void ExitPressed(const gnat::Message& m) {
-    pressed_ = true;
+  virtual void Deinit() {
+    delete camera_;
+    gfx_->Deinit();
+    gfx_.release();
   }
 
-  bool pressed() { return pressed_; }
+  virtual void Update(double delta) {
+    GetSignal("tick")->Send(delta);
+    gfx_->Update(delta);
+  }
 
  private:
 
-  bool pressed_;
+  FPSCamera* camera_;
+  
+  Game* game_;
+  scoped_ptr<GraphicsContext> gfx_;
 };
 
 int main(int argc, char** argv) {
   gnat::FileUtils::SetBaseFilePathFromArgv(argv);
-
   gnat::SDLPlatformContext *sdl = new gnat::SDLPlatformContext(true, true);
-  gnat::GLPlatformContext* ctx = sdl;
-  ctx->InitDisplay(800, 600, false);
-  sdl->InitInput(true);
-
-  //FPSCamera* camera = new FPSCamera();
-  gnat::FPSCamera* camera = new gnat::FPSCamera();
-
-  ExitListener listen;
-  ctx->GetSignal("window_closed")->AddListener(listen.GetSlot("window_closed"));
-  sdl->GetSignal("mouse_move")->AddListener(camera->GetSlot("mouse_moved"));
-
-  sdl->GetKeyUpSignal(gnat::K_W)->AddListener(camera->GetSlot("key_up"));
-  sdl->GetKeyUpSignal(gnat::K_A)->AddListener(camera->GetSlot("key_up"));
-  sdl->GetKeyUpSignal(gnat::K_S)->AddListener(camera->GetSlot("key_up"));
-  sdl->GetKeyUpSignal(gnat::K_D)->AddListener(camera->GetSlot("key_up"));
-  sdl->GetKeyDownSignal(gnat::K_W)->AddListener(camera->GetSlot("key_down"));
-  sdl->GetKeyDownSignal(gnat::K_A)->AddListener(camera->GetSlot("key_down"));
-  sdl->GetKeyDownSignal(gnat::K_S)->AddListener(camera->GetSlot("key_down"));
-  sdl->GetKeyDownSignal(gnat::K_D)->AddListener(camera->GetSlot("key_down"));
-
-  gnat::Signal* sig = new gnat::Signal();
-  camera->GetSlot("tick")->ListenTo(sig);
-
-  gnat::GraphicsContext gfxctx(ctx);
-  gfxctx.Init();
-
-  gfxctx.SetMainCamera(camera->GetCamera());
-
-  gnat::MeshData d;
-  d.AddAttribute("position", 3, GL_FLOAT);
-  d.AddAttribute("normal", 3, GL_FLOAT);
-  d.Start(4, 6);
-  d.Append<gnat::Vector3>(gnat::Vector3(-1.0,  1.0, 0.0)); // UL
-  d.Append<gnat::Vector3>(gnat::Vector3( 0.0,  1.0, 0.0));
-  d.FinishVertex();
-  d.Append<gnat::Vector3>(gnat::Vector3(-1.0, -1.0, 0.0)); // LL
-  d.Append<gnat::Vector3>(gnat::Vector3( 1.0,  0.0, 0.0));
-  d.FinishVertex();
-  d.Append<gnat::Vector3>(gnat::Vector3( 1.0, -1.0, 0.0)); // LR
-  d.Append<gnat::Vector3>(gnat::Vector3( 0.0,  0.0, 1.0));
-  d.FinishVertex();
-  d.Append<gnat::Vector3>(gnat::Vector3( 1.0,  1.0, 0.0)); // UR
-  d.Append<gnat::Vector3>(gnat::Vector3( 0.0,  0.5, 0.5));
-  d.FinishVertex();
-  d.AddTriangle(0, 1, 2);
-  d.AddTriangle(0, 2, 3);
-  gnat::Mesh* m = new gnat::Mesh(&d);
-  gnat::MeshDrawable* md = new gnat::MeshDrawable(m);
-  gnat::Node* n = new gnat::Node();
-  n->AddDrawable(md);
-
-  gnat::Material* mat = new gnat::Material("test");
-
-  gnat::VertexShader *vs = new gnat::VertexShader(
-      "testvs", gnat::FileUtils::ReadFile(gnat::FileUtils::GetBaseFilePath() +
-                                          "../data/materials/vs.glsl"));
-  gnat::FragmentShader *fs = new gnat::FragmentShader(
-      "testfs", gnat::FileUtils::ReadFile(gnat::FileUtils::GetBaseFilePath() +
-                                          "../data/materials/fs.glsl"));
-
-  vs->Compile();
-  fs->Compile();
-
-  gnat::Program* program = new gnat::Program(vs, fs);
-  program->Link();
-  program->RegisterVertexAttribute("position");
-  program->RegisterVertexAttribute("normal");
-  program->RegisterAutoUniform("p", gnat::Program::PROJECTION_MATRIX);
-  program->RegisterAutoUniform("v", gnat::Program::VIEW_MATRIX);
-  program->RegisterAutoUniform("m", gnat::Program::WORLD_MATRIX);
-  program->RegisterAutoUniform("mvp", gnat::Program::MVP_MATRIX);
-  mat->set_shader(program);
-
-  md->SetMaterial(mat);
-
-  gfxctx.GetRootNode()->AddChild(n);
-
-  float test = 0.0;
-  gnat::ColorF32 color(0.0, 0.0, 0.0, 0.0);
-
-  n->SetPosition(gnat::Vector3(0, 0.5, 0));
-  camera->SetPosition(gnat::Vector3(0,0,2));
-
-  gnat::Timer t;
-  t.Start();
-
-  float last = t.GetTimeSeconds();
-
-  while(!listen.pressed()) {
-    float now = t.GetTimeSeconds();
-    float delta = now - last;
-    last = now;
-    sig->Send(double(delta));
-    if (sdl->IsKeyPressed(gnat::K_W)) {
-      color.r += 0.01f;
-    }
-    gfxctx.SetClearColor(color);
-    gfxctx.Update(0.0);
-  }
-
-  ctx->Deinit();
-  gfxctx.Deinit();
-  delete ctx;
-
+  Game g;
+  g.Init(sdl, sdl);
+  g.Go(new TestState(), 800, 600, false, true);
+  sdl->Deinit();
+  delete sdl;
   return 0;
 }
-
 

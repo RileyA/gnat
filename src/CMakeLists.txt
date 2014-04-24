@@ -12,6 +12,10 @@ set(GNAT_FILES
   event/slot.cc
   event/slot.h
 
+  game/game.cc
+  game/game.h
+  game/game_state.h
+
   gfx/material/material.cc
   gfx/material/material.h
   gfx/material/program.cc
