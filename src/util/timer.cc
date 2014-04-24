@@ -22,18 +22,22 @@ void Timer::Stop() {
 //---------------------------------------------------------------------------
 
 Real Timer::GetTimeSeconds() {
-  return timing_ ? (GetTimeMilliseconds() * 1000.0) : elapsed_;
+  return timing_ ? (GetTimeMilliseconds() / 1000.0) : elapsed_;
 }
 //---------------------------------------------------------------------------
 
 Real Timer::GetTimeMilliseconds() {
   if (!timing_)
     return elapsed_;
+#ifdef WIN32
+  // TODO
+#else
   struct timeval now;
   gettimeofday(&now, 0);
   long seconds  = now.tv_sec  - start_.tv_sec;
   long useconds = now.tv_usec - start_.tv_usec;
   return (seconds * 1000.f + useconds / 1000.f);
+#endif
 }
 //---------------------------------------------------------------------------
 
