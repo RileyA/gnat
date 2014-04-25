@@ -1,0 +1,20 @@
+{
+  "name" : "GUI",
+  "program" : {
+    "vertex_program"   : "../data/materials/gui_vs.glsl",
+    "fragment_program" : "../data/materials/gui_fs.glsl",
+    "attributes" : [
+      "position",
+      "color",
+      "uv"
+    ],
+    "uniforms" : [],
+    "textures" : [
+      {
+        "name" : "../data/gui/gui.png",
+        "alpha": true,
+        "uniform" : "gui"
+      }
+    ]
+  }
+}

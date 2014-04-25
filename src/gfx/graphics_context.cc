@@ -2,7 +2,11 @@
 
 #include "platform/gl_platform_context.h"
 #include "gfx/scene/mesh.h"
+#include "gfx/material/texture.h"
+#include "gfx/material/material.h"
 #include "gl.h"
+
+#include "third_party/oyster/include/Oyster.h"
 
 namespace gnat {
 
@@ -16,10 +20,20 @@ GraphicsContext::~GraphicsContext() {
        ++it) {
     delete it->second;
   }
+  for (Map<String, Texture *>::iterator it = textures_.begin();
+       it != textures_.end(); ++it) {
+    delete it->second;
+  }
+  for (Map<String, Material *>::iterator it = materials_.begin();
+       it != materials_.end(); ++it) {
+    delete it->second;
+  }
 }
 //---------------------------------------------------------------------------
 
 void GraphicsContext::Init() {
+  oyster_ = new Oyster::Oyster(platform_context_->width(),
+                               platform_context_->height());
   glEnable(GL_DEPTH_TEST);
   glEnable(GL_CULL_FACE);
 }
@@ -32,9 +46,7 @@ void GraphicsContext::Deinit() {
 void GraphicsContext::Update(Real delta) {
   // Clear and ensure we have the right viewport
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-
-  // TODO listen for resized event from platform_context_
-  glViewport(0, 0, platform_context_->width(), platform_context_->height());
+// TODO listen for resized event from platform_context_ glViewport(0, 0, platform_context_->width(), platform_context_->height());
 
   RenderFrame(camera_);
 
@@ -58,10 +70,30 @@ void GraphicsContext::SetMainCamera(Camera* camera) {
 }
 //---------------------------------------------------------------------------
 
-Mesh* GraphicsContext::LoadMesh(String filename) {
+Mesh* GraphicsContext::GetMesh(String filename) {
   if (meshes_.count(filename))
     return meshes_[filename];
-  return meshes_[filename] = Mesh::Load(filename);
+  Mesh* out = Mesh::Load(filename);
+  if (out)
+    return meshes_[filename] = out;
+}
+//---------------------------------------------------------------------------
+
+Texture* GraphicsContext::GetTexture(String filename, bool alpha) {
+  if (textures_.count(filename))
+    return textures_[filename];
+  Texture* out = Texture::Load(filename, alpha);
+  if (out)
+    return textures_[filename] = out;
+}
+//---------------------------------------------------------------------------
+
+Material* GraphicsContext::GetMaterial(String filename) {
+  if (materials_.count(filename))
+    return materials_[filename];
+  Material* out = Material::FromFile(this, filename);
+  if (out)
+    return materials_[filename] = out;
 }
 //---------------------------------------------------------------------------
 

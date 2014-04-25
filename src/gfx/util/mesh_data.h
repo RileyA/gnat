@@ -22,7 +22,7 @@ class MeshData {
     GLenum type;
   };
 
-  MeshData();
+  MeshData(bool dynamic = false);
   ~MeshData();
 
   // Add a new vertex attribute. Returns its offset.
@@ -55,6 +55,7 @@ class MeshData {
   void AddIndex(uint32_t index);
   void AddTriangle(uint32_t v1, uint32_t v2, uint32_t v3);
 
+  bool dynamic() { return dynamic_; }
   size_t size() { return data_.size(); }
   size_t stride() { return stride_; }
 
@@ -68,6 +69,7 @@ class MeshData {
  private:
 
   bool started_;
+  bool dynamic_;
   
   size_t current_vertex_;
 
