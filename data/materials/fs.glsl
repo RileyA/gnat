@@ -1,11 +1,13 @@
 #version 110
 
 varying vec3 n;
+varying vec2 v_uv;
 
 uniform float brightness;
 uniform vec2 offset;
+uniform sampler2D ao;
 
 void main() {
-  //n = normalize(n);
-  gl_FragColor = brightness * vec4((n.x + 1.0) / 2.0 + offset.x, (n.z + 1.0) / 2.0 + offset.y, (n.z + 1.0) / 2.0, 1.0);
+  gl_FragColor = vec4(texture2D(ao, v_uv.xy).xyz, 1.0) +
+                 0.0 * brightness * n.xyzz;
 }

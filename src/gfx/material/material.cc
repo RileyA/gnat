@@ -1,7 +1,9 @@
 #include "gnat.h"
 
+#include "gfx/graphics_context.h"
 #include "gfx/material/material.h"
 #include "gfx/material/program.h"
+#include "gfx/material/texture.h"
 #include "util/file_utils.h"
 #include "util/json.h"
 
@@ -18,11 +20,25 @@ void Material::Use() {
   if (shader_program_) {
     glUseProgram(shader_program_->handle());
   }
+
+  GLenum idx = GL_TEXTURE0;
+  for (List<Texture *>::iterator it = textures_.begin(); it != textures_.end();
+       ++it)
+    (*it)->Bind(idx++);
 }
 
 void Material::DoneUsing() {
   if (shader_program_) {
     glUseProgram(0);
+  }
+}
+
+void Material::AddTexture(Texture* texture, String uniform) {
+  if (!texture)
+    return;
+  textures_.push_back(texture);
+  if (shader_program_ && !uniform.empty()) {
+    shader_program_->SetUniform1i(uniform, textures_.size() - 1);
   }
 }
 
@@ -114,8 +130,6 @@ Material* Material::FromFile(GraphicsContext* gfx, String filename) {
       }
     }
 
-    glUseProgram(0);
-    
     // Vertex attributes.
     if (j.Has("attributes") && j["attributes"].type() == JsonValue::kArray) {
       for (int i = 0; i < j["attributes"].size(); ++i) {
@@ -124,6 +138,22 @@ Material* Material::FromFile(GraphicsContext* gfx, String filename) {
           program->RegisterVertexAttribute(a.string());
       }
     }
+
+    if (j.Has("textures") && j["textures"].type() == JsonValue::kArray) {
+      for (int i = 0; i < j["textures"].size(); ++i) {
+        JsonValue& t = j["textures"][i];
+        if (t.type() == JsonValue::kObject && t.Has("name")) {
+          bool alpha = t.Has("alpha") &&
+                       t["alpha"].type() == JsonValue::kBoolean && t["alpha"];
+          String uniform = "";
+          if (t.Has("uniform") && t["uniform"].type() == JsonValue::kString)
+            uniform = t["uniform"].string();
+          m->AddTexture(gfx->GetTexture(t["name"].string(), alpha), uniform);
+        }
+      }
+    }
+
+    glUseProgram(0);
   }
 
   return m;

@@ -54,6 +54,7 @@ void MeshData::FinishVertex() {
 
 void MeshData::AppendData(void* buffer, size_t size) {
   DCHECK(started_);
+  printf("append %d\n", size);
   size_t idx = data_.size();
   data_.resize(data_.size() + size);
   memcpy(reinterpret_cast<void*>(&data_[idx]), buffer, size);

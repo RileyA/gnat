@@ -22,6 +22,8 @@ set(GNAT_FILES
   gfx/material/program.h
   gfx/material/shader.cc
   gfx/material/shader.h
+  gfx/material/texture.cc
+  gfx/material/texture.h
   gfx/graphics_context.cc
   gfx/graphics_context.h
   gfx/scene/camera.cc
@@ -82,7 +84,7 @@ find_package(OpenGL)
 
 add_library(gnat SHARED ${GNAT_FILES} )
 set_target_properties(gnat PROPERTIES LINKER_LANGUAGE CXX)
-target_link_libraries(gnat SDL2 GLEW ${OPENGL_LIBRARIES})
+target_link_libraries(gnat SDL2 GLEW png ${OPENGL_LIBRARIES})
 
 install(TARGETS gnat
 	RUNTIME DESTINATION ${INSTALL_RUNTIMES_TO}

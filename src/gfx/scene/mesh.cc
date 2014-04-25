@@ -89,6 +89,7 @@ Mesh* Mesh::LoadPLY(String filename) {
 
   bool positions = false;;
   bool normals = false;;
+  bool uv = false;
 
   // advance to properties
   while (tmp != "property") file >> tmp;
@@ -103,6 +104,9 @@ Mesh* Mesh::LoadPLY(String filename) {
     } else if (name == "nx") {
       d.AddAttribute("normal", 3, GL_FLOAT);
       normals = true;
+    } else if (name == "s") {
+      d.AddAttribute("uv", 2, GL_FLOAT);
+      uv = true;
     }
     while (tmp != "property" && tmp != "element") file >> tmp;
   }
@@ -129,6 +133,14 @@ Mesh* Mesh::LoadPLY(String filename) {
       file >> n.y;
       file >> n.z;
       d.Append<Vector3>(n);
+    }
+    if (uv) {
+      float s, t;
+      file >> s;
+      file >> t;
+      d.Append<float>(s);
+      d.Append<float>(t);
+      printf("%f %f\n", s, t);
     }
     d.FinishVertex();
   }

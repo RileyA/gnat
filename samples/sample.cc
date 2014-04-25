@@ -54,12 +54,12 @@ class TestState : public GameState {
     Signal* tick = CreateSignal("tick");
     camera_->GetSlot("tick")->ListenTo(tick);
 
-    Mesh* m = gfx_->LoadMesh("../data/meshes/monkey.ply");
+    Mesh* m = gfx_->GetMesh("../data/meshes/monkey_uv.ply");
     MeshDrawable* md = new MeshDrawable(m);
     Node* n = new Node();
     n->AddDrawable(md);
 
-    Material* mat = Material::FromFile(gfx_.get(), "../data/materials/test.material");
+    Material* mat = gfx_->GetMaterial("../data/materials/test.material");
 
     md->SetMaterial(mat);
     gfx_->GetRootNode()->AddChild(n);
