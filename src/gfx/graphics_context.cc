@@ -6,6 +6,8 @@
 #include "gfx/material/material.h"
 #include "gl.h"
 
+#include "third_party/oyster/include/Oyster.h"
+
 namespace gnat {
 
 GraphicsContext::GraphicsContext(GLPlatformContext* platform_context)
@@ -30,6 +32,8 @@ GraphicsContext::~GraphicsContext() {
 //---------------------------------------------------------------------------
 
 void GraphicsContext::Init() {
+  oyster_ = new Oyster::Oyster(platform_context_->width(),
+                               platform_context_->height());
   glEnable(GL_DEPTH_TEST);
   glEnable(GL_CULL_FACE);
 }

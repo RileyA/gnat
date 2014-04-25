@@ -8,6 +8,10 @@
 #include "gfx/scene/scene_manager.h"
 #include "util/color.h"
 
+namespace Oyster {
+class Oyster;
+}
+
 namespace gnat {
 
 class GLPlatformContext;
@@ -37,6 +41,8 @@ class GraphicsContext : public EventHandler {
 
   Node* GetRootNode() { return &root_; }
 
+  Oyster::Oyster* oyster() { return oyster_; }
+
  private:
   
   Map<String, Mesh*> meshes_;
@@ -52,6 +58,8 @@ class GraphicsContext : public EventHandler {
   Node root_;
 
   SceneManager scene_manager_;
+
+  Oyster::Oyster* oyster_;
 };
 
 }  // namespace gnat

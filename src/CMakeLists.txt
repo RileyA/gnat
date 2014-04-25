@@ -44,6 +44,8 @@ set(GNAT_FILES
   gfx/util/buffer_object.h
   gfx/util/mesh_data.cc
   gfx/util/mesh_data.h
+  gfx/util/oyster_mesh.cc
+  gfx/util/oyster_mesh.h
   gfx/math/quaternion.cc
   gfx/math/quaternion.h
   gfx/math/vector3.cc

@@ -9,5 +9,5 @@ uniform sampler2D ao;
 
 void main() {
   gl_FragColor = vec4(texture2D(ao, v_uv.xy).xyz, 1.0) +
-                 0.0 * brightness * n.xyzz;
+                 0.3 * brightness * n.xyzz;
 }
