@@ -1,6 +1,7 @@
 #include "gfx/graphics_context.h"
 
 #include "platform/gl_platform_context.h"
+#include "gfx/scene/mesh.h"
 #include "gl.h"
 
 namespace gnat {
@@ -11,7 +12,10 @@ GraphicsContext::GraphicsContext(GLPlatformContext* platform_context)
 //---------------------------------------------------------------------------
 
 GraphicsContext::~GraphicsContext() {
-  
+  for (Map<String, Mesh *>::iterator it = meshes_.begin(); it != meshes_.end();
+       ++it) {
+    delete it->second;
+  }
 }
 //---------------------------------------------------------------------------
 
@@ -51,6 +55,13 @@ void GraphicsContext::SetClearColor(ColorF32 color) {
 
 void GraphicsContext::SetMainCamera(Camera* camera) {
   camera_ = camera;
+}
+//---------------------------------------------------------------------------
+
+Mesh* GraphicsContext::LoadMesh(String filename) {
+  if (meshes_.count(filename))
+    return meshes_[filename];
+  return meshes_[filename] = Mesh::Load(filename);
 }
 //---------------------------------------------------------------------------
 

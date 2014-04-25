@@ -53,6 +53,18 @@ JsonValue::~JsonValue() {
 }
 //---------------------------------------------------------------------------
 
+bool JsonValue::Has(int idx) {
+  DCHECK(type_ == kArray);
+  return idx >= 0 && idx < v.size();
+}
+//---------------------------------------------------------------------------
+
+bool JsonValue::Has(const char* key) {
+  DCHECK(type_ == kObject);
+  return entries_.count(String(key));
+}
+//---------------------------------------------------------------------------
+
 JsonValue& JsonValue::operator[](int idx) {
   if (type_ == kArray) {
     DCHECK(idx >= 0 && idx < v.size());
@@ -63,6 +75,7 @@ JsonValue& JsonValue::operator[](int idx) {
 //---------------------------------------------------------------------------
 
 JsonValue& JsonValue::operator[](String key) {
+  DCHECK(Has(key.c_str()));
   if (type_ == kObject)
     return *(entries_[key]);
   NOTREACHED(); return *this;
@@ -70,6 +83,7 @@ JsonValue& JsonValue::operator[](String key) {
 //---------------------------------------------------------------------------
 
 JsonValue& JsonValue::operator[](const char* key) {
+  DCHECK(Has(key));
   if (type_ == kObject)
     return *(entries_[String(key)]);
   NOTREACHED(); return *this;
@@ -81,7 +95,7 @@ JsonValue::operator bool() const {
     return false;
   if (type_ == kBoolean)
     return data_.b;
-  NOTREACHED(); return false;
+  return true;
 }
 //---------------------------------------------------------------------------
 
@@ -190,8 +204,9 @@ void JsonValue::ParseString(const char** string) {
 void JsonValue::ParseNumber(const char** string) {
   // TODO make this more robust
   data_.d = atof(*string);
-  while(**string != ',' && **string != ']', **string != '}')
+  while(**string != ',' && **string != ']' && **string != '}')
     safe_increment(string);
+  --(*string);
 }
 //---------------------------------------------------------------------------
 

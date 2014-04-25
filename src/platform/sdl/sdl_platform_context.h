@@ -10,6 +10,9 @@
 
 namespace gnat {
 
+enum MouseButton {
+};
+
 class SDLPlatformContext : public InputPlatformContext,
                            public GLPlatformContext {
  public:
@@ -24,9 +27,12 @@ class SDLPlatformContext : public InputPlatformContext,
   virtual long GetWindowHandle();
 
   // InputPlatformContext impl
-  virtual void InitInput();
+  virtual void InitInput(bool lock_mouse);
   virtual void UpdateInput();
-  virtual bool IsKeyPressed(uint32_t code);
+  virtual bool IsKeyPressed(KeyCode code);
+  virtual bool IsMousePressed(unsigned char index);
+  virtual Signal* GetKeyUpSignal(KeyCode code);
+  virtual Signal* GetKeyDownSignal(KeyCode code);
 
   // Shared fns
   virtual void Deinit();
@@ -38,7 +44,12 @@ class SDLPlatformContext : public InputPlatformContext,
   void OnKeyDown(const SDL_Event& event);
   void OnKeyUp(const SDL_Event& event);
 
+  void OnMouseDown(const SDL_Event& event);
+  void OnMouseUp(const SDL_Event& event);
+
   void OnMouseMove(const SDL_Event& event);
+
+  KeyCode ConvertSDLKeycode(SDL_Keycode k);
 
   SDL_Window* window_;
   SDL_GLContext context_;
@@ -46,7 +57,10 @@ class SDLPlatformContext : public InputPlatformContext,
   bool gl_context_;
   bool input_context_;
 
-  Set<SDL_Scancode> keys_down_;
+  Set<KeyCode> keys_down_;
+  Set<unsigned char> mouse_down_;
+  Map<KeyCode, Signal*> key_down_signals_;
+  Map<KeyCode, Signal*> key_up_signals_;
 };
 
 }  // namespace gnat

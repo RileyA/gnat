@@ -12,6 +12,10 @@ set(GNAT_FILES
   event/slot.cc
   event/slot.h
 
+  game/game.cc
+  game/game.h
+  game/game_state.h
+
   gfx/material/material.cc
   gfx/material/material.h
   gfx/material/program.cc
@@ -24,6 +28,8 @@ set(GNAT_FILES
   gfx/scene/camera.h
   gfx/scene/drawable.cc
   gfx/scene/drawable.h
+  gfx/scene/fps_camera.cc
+  gfx/scene/fps_camera.h
   gfx/scene/mesh.cc
   gfx/scene/mesh.h
   gfx/scene/mesh_drawable.cc
@@ -49,6 +55,8 @@ set(GNAT_FILES
 
   platform/gl_platform_context.h
   platform/input_platform_context.h
+  platform/keycodes.cc
+  platform/keycodes.h
   platform/platform_context.h
 
   platform/sdl/sdl_platform_context.cc

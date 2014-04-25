@@ -22,6 +22,9 @@ class JsonValue {
 
   ~JsonValue();
 
+  bool Has(int idx);
+  bool Has(const char* key);
+
   // Bracket getters for objects/arrays.
   JsonValue& operator[](int idx);
   JsonValue& operator[](String key);
@@ -33,6 +36,21 @@ class JsonValue {
   operator const char*() const;
 
   Type type() { return type_; }
+
+  String string() {
+    DCHECK(type_ == kString);
+    return s;
+  }
+
+  int integer() {
+    DCHECK(type_ == kNumber);
+    return round(data_.d);
+  }
+
+  double floating() {
+    DCHECK(type_ == kNumber);
+    return data_.d;
+  }
 
   static String RemoveWhitespace(String in);
   static String ReadString(const char** string);
