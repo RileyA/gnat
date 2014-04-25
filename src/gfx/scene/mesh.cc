@@ -16,9 +16,11 @@ Mesh::Mesh(MeshData* data) {
 }
 
 void Mesh::CreateFromMeshData(MeshData* data) {
-  vbo_ = VertexBufferObject(data->size(), GL_STATIC_DRAW);
-  ibo_ =
-      IndexBufferObject(data->num_indices() * sizeof(uint32_t), GL_STATIC_DRAW);
+  vbo_ = VertexBufferObject(data->size(),
+                            data->dynamic() ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
+  ibo_ = IndexBufferObject(data->num_indices() * sizeof(uint32_t),
+                           data->dynamic() ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
+  num_verts_ = allocated_verts_ = data->num_verts();
   unsigned char* buffer = static_cast<unsigned char*>(vbo_.MapBuffer());
   memcpy(buffer, data->GetBuffer(), data->size());
   vbo_.UnmapBuffer();
@@ -30,9 +32,10 @@ void Mesh::CreateFromMeshData(MeshData* data) {
   stride_ = data->stride();
 
   buffer = static_cast<unsigned char*>(ibo_.MapBuffer());
-  num_indices_ = data->num_indices();
+  num_indices_ = allocated_indices_ = data->num_indices();
   memcpy(buffer, data->indices(), num_indices_ * sizeof(uint32_t));
   ibo_.UnmapBuffer();
+  DCHECK(glGetError() == GL_NO_ERROR);
 }
 
 void Mesh::Draw(Material* material) {
@@ -58,6 +61,32 @@ void Mesh::Draw(Material* material) {
 
   ibo_.Unbind();
   vbo_.Unbind();
+}
+
+void Mesh::UpdateFromMeshData(MeshData* data, bool verts, bool indices) {
+  if (verts) {
+    if (allocated_verts_ < data->num_verts()) {
+      vbo_ = VertexBufferObject(
+          data->size(), data->dynamic() ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
+      allocated_verts_ = data->num_verts();
+    }
+    num_verts_ = data->num_verts();
+    unsigned char* buffer = static_cast<unsigned char*>(vbo_.MapBuffer());
+    memcpy(buffer, data->GetBuffer(), data->size());
+    vbo_.UnmapBuffer();
+  }
+  if (indices) {
+    if (allocated_indices_ < data->num_indices()) {
+      ibo_ =
+          IndexBufferObject(data->num_indices() * sizeof(uint32_t),
+                            data->dynamic() ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
+      allocated_indices_ = data->num_indices();
+    }
+    num_indices_ = data->num_indices();
+    unsigned char* buffer = static_cast<unsigned char*>(ibo_.MapBuffer());
+    memcpy(buffer, data->indices(), data->num_indices());
+    ibo_.UnmapBuffer();
+  }
 }
 
 Mesh* Mesh::Load(String filename) {
@@ -89,6 +118,7 @@ Mesh* Mesh::LoadPLY(String filename) {
 
   bool positions = false;;
   bool normals = false;;
+  bool uv = false;
 
   // advance to properties
   while (tmp != "property") file >> tmp;
@@ -103,6 +133,9 @@ Mesh* Mesh::LoadPLY(String filename) {
     } else if (name == "nx") {
       d.AddAttribute("normal", 3, GL_FLOAT);
       normals = true;
+    } else if (name == "s") {
+      d.AddAttribute("uv", 2, GL_FLOAT);
+      uv = true;
     }
     while (tmp != "property" && tmp != "element") file >> tmp;
   }
@@ -129,6 +162,13 @@ Mesh* Mesh::LoadPLY(String filename) {
       file >> n.y;
       file >> n.z;
       d.Append<Vector3>(n);
+    }
+    if (uv) {
+      float s, t;
+      file >> s;
+      file >> t;
+      d.Append<float>(s);
+      d.Append<float>(t);
     }
     d.FinishVertex();
   }

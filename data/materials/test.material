@@ -5,7 +5,8 @@
     "fragment_program" : "../data/materials/fs.glsl",
     "attributes" : [
       "position",
-      "normal"
+      "normal",
+      "uv"
     ],
     "uniforms" : [
       {
@@ -22,6 +23,13 @@
         "name"  : "offset",
         "type"  : "vec2",
         "value" : [1.0, 0.0]
+      }
+    ],
+    "textures" : [
+      {
+        "name" : "../data/materials/monkey_ao.png",
+        "alpha": true,
+        "uniform" : "ao"
       }
     ]
   }

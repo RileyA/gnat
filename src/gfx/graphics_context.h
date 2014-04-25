@@ -8,10 +8,16 @@
 #include "gfx/scene/scene_manager.h"
 #include "util/color.h"
 
+namespace Oyster {
+class Oyster;
+}
+
 namespace gnat {
 
 class GLPlatformContext;
 class Mesh;
+class Texture;
+class Material;
 
 class GraphicsContext : public EventHandler {
  public:
@@ -29,15 +35,19 @@ class GraphicsContext : public EventHandler {
 
   void SetMainCamera(Camera* camera);
 
-  Mesh* LoadMesh(String filename);
-  //Texture* LoadTexture(String filename);
+  Mesh* GetMesh(String filename);
+  Texture* GetTexture(String filename, bool alpha);
+  Material* GetMaterial(String filename);
 
   Node* GetRootNode() { return &root_; }
+
+  Oyster::Oyster* oyster() { return oyster_; }
 
  private:
   
   Map<String, Mesh*> meshes_;
-  //Map<String, Texture*> textures_;
+  Map<String, Texture*> textures_;
+  Map<String, Material*> materials_;
 
   GLPlatformContext* platform_context_;
 
@@ -48,6 +58,8 @@ class GraphicsContext : public EventHandler {
   Node root_;
 
   SceneManager scene_manager_;
+
+  Oyster::Oyster* oyster_;
 };
 
 }  // namespace gnat

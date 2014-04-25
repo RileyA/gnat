@@ -12,8 +12,9 @@ size_t gl_sizeof(GLenum type) {
   }
 }
 
-MeshData::MeshData()
+MeshData::MeshData(bool dynamic)
   : started_(false),
+    dynamic_(dynamic),
     current_vertex_(0),
     num_verts_(0),
     stride_(0) {}
@@ -31,10 +32,16 @@ void MeshData::AddAttribute(String name, uint32_t size, GLenum type) {
 //---------------------------------------------------------------------------
 
 void MeshData::Start(size_t num_verts, size_t num_indices) {
-  DCHECK(!started_);
-  data_.reserve(num_verts * stride_);
-  indices_.reserve(num_indices);
+  //DCHECK(!started_);
+  if (num_verts != 0) {
+    data_.resize(0);
+    data_.reserve(num_verts * stride_);
+  }
+  if (num_indices != 0) {
+    indices_.resize(num_indices);
+  }
   started_ = true;
+  current_vertex_ = 0;
 }
 //---------------------------------------------------------------------------
 

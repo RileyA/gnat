@@ -7,6 +7,7 @@ namespace gnat {
 
 class Program;
 class GraphicsContext;
+class Texture;
 
 class Material {
  public:
@@ -19,8 +20,9 @@ class Material {
   const String& get_name() const { return name_; }
 
   void set_shader(Program* p) { shader_program_ = p; }
-
   Program* shader_program() { return shader_program_; }
+
+  void AddTexture(Texture* texture, String uniform = "");
 
   static Material* FromFile(GraphicsContext* gfx, String filename);
 
@@ -29,6 +31,7 @@ class Material {
   bool using_;
 
   Program* shader_program_;
+  List<Texture*> textures_;
 };
 
 }
