@@ -136,6 +136,7 @@ void Node::ComputeTransform() {
   transform_ = Matrix4(orientation_);
   transform_.SetTrans(position_);
   if (parent_)
+    //transform_ = transform_ * parent_->GetTransform();
     transform_ = parent_->GetTransform() * transform_;
   for (List<Node*>::iterator it = children_.begin(); it != children_.end();
        ++it) {

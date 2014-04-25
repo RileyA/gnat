@@ -25,6 +25,8 @@ Program::Program(VertexShader* vs, FragmentShader* fs)
 Program::~Program() {
   if (ready_)
     glDeleteProgram(handle_);
+  delete vs_;
+  delete fs_;
 }
 //-----------------------------------------------------------------------
 
@@ -67,11 +69,65 @@ void Program::RegisterAutoUniform(String name, AutoUniformType uniform) {
 }
 //-----------------------------------------------------------------------
 
-void Program::RegisterUniform(String name) {
+void Program::RegisterAutoUniform(String name, String uniform) {
+  AutoUniformType type;
+  if (uniform == "MVP_MATRIX")
+    type = MVP_MATRIX;
+  else if (uniform == "WORLD_MATRIX")
+    type = WORLD_MATRIX;
+  else if (uniform == "VIEW_MATRIX")
+    type = VIEW_MATRIX;
+  else if (uniform == "PROJECTION_MATRIX")
+    type = PROJECTION_MATRIX;
+  else
+    return;
+  RegisterAutoUniform(name, type);
+}
+//-----------------------------------------------------------------------
+
+GLuint Program::RegisterUniform(String name) {
   DCHECK(ready_);
+  if (uniforms_.find(name) != uniforms_.end())
+    return uniforms_[name];
   GLuint addr = glGetUniformLocation(handle_, name.c_str());
   DCHECK(glGetError() == GL_NO_ERROR);
   uniforms_[name] = addr;
+  return addr;
+}
+//-----------------------------------------------------------------------
+
+void Program::SetUniform1i(String name, int i) {
+  GLuint addr = RegisterUniform(name);
+  glUniform1i(addr, i);
+  DCHECK(glGetError() == GL_NO_ERROR);
+}
+//-----------------------------------------------------------------------
+
+void Program::SetUniform1f(String name, float f) {
+  GLuint addr = RegisterUniform(name);
+  glUniform1f(addr, f);
+  DCHECK(glGetError() == GL_NO_ERROR);
+}
+//-----------------------------------------------------------------------
+
+void Program::SetUniform2f(String name, float* f) {
+  GLuint addr = RegisterUniform(name);
+  glUniform2fv(addr, 1, f);
+  DCHECK(glGetError() == GL_NO_ERROR);
+}
+//-----------------------------------------------------------------------
+
+void Program::SetUniform3f(String name, float* f) {
+  GLuint addr = RegisterUniform(name);
+  glUniform3fv(addr, 1, f);
+  DCHECK(glGetError() == GL_NO_ERROR);
+}
+//-----------------------------------------------------------------------
+
+void Program::SetUniform4f(String name, float* f) {
+  GLuint addr = RegisterUniform(name);
+  glUniform4fv(addr, 1, f);
+  DCHECK(glGetError() == GL_NO_ERROR);
 }
 //-----------------------------------------------------------------------
 

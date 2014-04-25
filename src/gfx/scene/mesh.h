@@ -19,7 +19,11 @@ class Mesh {
 
   void Draw(Material* material);
 
+  static Mesh* Load(String filename);
+
  private:
+ 
+  static Mesh* LoadPLY(String filename);
 
   void CreateFromMeshData(MeshData* d);
 
