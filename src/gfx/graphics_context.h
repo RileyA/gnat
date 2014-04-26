@@ -6,6 +6,7 @@
 #include "gfx/scene/camera.h"
 #include "gfx/scene/node.h"
 #include "gfx/scene/scene_manager.h"
+#include "platform/gl_platform_context.h"
 #include "util/color.h"
 
 namespace Oyster {
@@ -42,6 +43,9 @@ class GraphicsContext : public EventHandler {
   Node* GetRootNode() { return &root_; }
 
   Oyster::Oyster* oyster() { return oyster_; }
+
+  int width() { platform_context_->width(); }
+  int height() { platform_context_->height(); }
 
  private:
   
