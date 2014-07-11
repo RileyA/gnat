@@ -82,11 +82,15 @@ set(GNAT_FILES
   util/timer.h
 	)
 
-find_package(OpenGL)
+find_package(OpenGL REQUIRED)
+find_package(PNG REQUIRED)
+
+include_directories(${PNG_INCLUDE_DIR})
+include_directories(${OPENGL_INCLUDE_DIR})
 
 add_library(gnat SHARED ${GNAT_FILES} )
 set_target_properties(gnat PROPERTIES LINKER_LANGUAGE CXX)
-target_link_libraries(gnat SDL2 GLEW png ${OPENGL_LIBRARIES})
+target_link_libraries(gnat SDL2 GLEW ${OPENGL_LIBRARIES} ${PNG_LIBRARY})
 
 install(TARGETS gnat
 	RUNTIME DESTINATION ${INSTALL_RUNTIMES_TO}
