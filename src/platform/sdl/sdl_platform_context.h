@@ -49,8 +49,6 @@ class SDLPlatformContext : public InputPlatformContext,
 
   void OnMouseMove(const SDL_Event& event);
 
-  KeyCode ConvertSDLKeycode(SDL_Keycode k);
-
   SDL_Window* window_;
   SDL_GLContext context_;
 
