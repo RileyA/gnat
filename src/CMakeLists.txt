@@ -65,6 +65,8 @@ set(GNAT_FILES
 
   platform/sdl/sdl_platform_context.cc
   platform/sdl/sdl_platform_context.h
+  platform/sdl/sdl_keycode_conversion.cc
+  platform/sdl/sdl_keycode_conversion.h
 
   third_party/FastDelegate/FastDelegate.h
 
