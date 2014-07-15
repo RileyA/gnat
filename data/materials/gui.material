@@ -15,6 +15,12 @@
         "alpha": true,
         "uniform" : "gui"
       }
-    ]
+    ],
+    "properties" : {
+      "blend_mode" : "alpha",
+      "depth_check" : "always",
+      "depth_write" : false,
+      "draw_group" : 10
+    }
   }
 }

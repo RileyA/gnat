@@ -28,8 +28,9 @@ class SceneManager : public Node::Visitor {
 
   typedef List<Drawable*> DrawQueue;
   typedef Map<Material*,  DrawQueue> DrawMap;
+  typedef Map<int, DrawMap> DrawGroupMap;
 
-  DrawMap draws_;
+  DrawGroupMap draws_;
 };
 
 }  // namespace gnat

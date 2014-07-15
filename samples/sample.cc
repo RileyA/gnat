@@ -67,6 +67,9 @@ class TestState : public GameState {
     r = b->createLayer(1)->createRectangle(0, 0, 50, 50);
     r->setSprite("cursor");
 
+    txt =
+        b->getLayer(1)->createText("FPS: 60", 100, 100, 500, 50, 255, 255, 255);
+
     om->Update();
     om->Update();
 
@@ -96,6 +99,9 @@ class TestState : public GameState {
   }
 
   virtual void Update(double delta) {
+    if (delta > 1.f) {
+      delta = 0.f;
+    }
     if (dl + delta > 1.f && dl <= 1.f) {
       r->setSprite("text");
       r->setPosition(50, 50);
@@ -111,6 +117,7 @@ class TestState : public GameState {
 
   OysterMesh* om;
   Oyster::Rectangle* r;
+  Oyster::Text* txt;
   float dl;
 
   FPSCamera* camera_;
