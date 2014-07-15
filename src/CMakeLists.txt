@@ -16,6 +16,8 @@ set(GNAT_FILES
   game/game.h
   game/game_state.h
 
+  gfx/framebuffer_object.cc
+  gfx/framebuffer_object.h
   gfx/material/material.cc
   gfx/material/material.h
   gfx/material/program.cc
