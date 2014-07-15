@@ -58,6 +58,8 @@ set(GNAT_FILES
   gfx/math/matrix3.h
   gfx/math/matrix4.cc
   gfx/math/matrix4.h
+  gfx/math/geometry/aabb.cc
+  gfx/math/geometry/aabb.h
 
   platform/gl_platform_context.h
   platform/input_platform_context.h
