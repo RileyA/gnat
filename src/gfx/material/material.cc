@@ -22,11 +22,9 @@ Material::Material(String name)
 Material::~Material() {}
 
 void Material::Use() {
-
   // For now push/pop everything
   glPushAttrib(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_ENABLE_BIT |
                GL_TEXTURE_BIT);
-
   if (shader_program_) {
     glUseProgram(shader_program_->handle());
   }
@@ -45,9 +43,9 @@ void Material::Use() {
   }
 
   GLenum idx = GL_TEXTURE0;
-  for (List<Texture *>::iterator it = textures_.begin(); it != textures_.end();
+  for (Map<String, Texture *>::iterator it = textures_.begin(); it != textures_.end();
        ++it)
-    (*it)->Bind(idx++);
+    it->second->Bind(idx++);
 }
 
 void Material::DoneUsing() {
@@ -58,12 +56,14 @@ void Material::DoneUsing() {
 }
 
 void Material::AddTexture(Texture* texture, String uniform) {
-  if (!texture)
-    return;
-  textures_.push_back(texture);
+  textures_[uniform] = texture;
   if (shader_program_ && !uniform.empty()) {
     shader_program_->SetUniform1i(uniform, textures_.size() - 1);
   }
+}
+
+void Material::BindTexture(Texture* texture, String uniform) {
+  textures_[uniform] = texture;
 }
 
 // This is hacky, but I want a working format for Ludum Dare
@@ -185,13 +185,16 @@ Material* Material::FromFile(GraphicsContext* gfx, String filename) {
     if (j.Has("textures") && j["textures"].type() == JsonValue::kArray) {
       for (int i = 0; i < j["textures"].size(); ++i) {
         JsonValue& t = j["textures"][i];
-        if (t.type() == JsonValue::kObject && t.Has("name")) {
+        if (t.type() == JsonValue::kObject) {
           bool alpha = t.Has("alpha") &&
                        t["alpha"].type() == JsonValue::kBoolean && t["alpha"];
           String uniform = "";
           if (t.Has("uniform") && t["uniform"].type() == JsonValue::kString)
             uniform = t["uniform"].string();
-          m->AddTexture(gfx->GetTexture(t["name"].string(), alpha), uniform);
+          if (t.Has("name"))
+            m->AddTexture(gfx->GetTexture(t["name"].string(), alpha), uniform);
+          else
+            m->AddTexture(0, uniform);
         }
       }
     }

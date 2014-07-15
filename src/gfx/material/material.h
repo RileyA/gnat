@@ -26,6 +26,7 @@ class Material {
   Program* shader_program() { return shader_program_; }
 
   void AddTexture(Texture* texture, String uniform = "");
+  void BindTexture(Texture* texture, String uniform);
 
   static Material* FromFile(GraphicsContext* gfx, String filename);
 
@@ -47,7 +48,7 @@ class Material {
   GLenum blend_dest_;
 
   Program* shader_program_;
-  List<Texture*> textures_;
+  Map<String, Texture*> textures_;
 };
 
 }
