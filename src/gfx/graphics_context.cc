@@ -35,7 +35,7 @@ void GraphicsContext::Init() {
   oyster_ = new Oyster::Oyster(platform_context_->width(),
                                platform_context_->height());
   glEnable(GL_DEPTH_TEST);
-  //glEnable(GL_CULL_FACE);
+  glViewport(0, 0, platform_context_->width(), platform_context_->height());
 }
 //---------------------------------------------------------------------------
 
@@ -46,7 +46,9 @@ void GraphicsContext::Deinit() {
 void GraphicsContext::Update(Real delta) {
   // Clear and ensure we have the right viewport
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-// TODO listen for resized event from platform_context_ glViewport(0, 0, platform_context_->width(), platform_context_->height());
+
+  // TODO listen for resized event from |platform_context_|
+  //glViewport(0, 0, platform_context_->width(), platform_context_->height());
 
   RenderFrame(camera_);
 

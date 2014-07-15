@@ -19,6 +19,7 @@ class GLPlatformContext;
 class Mesh;
 class Texture;
 class Material;
+class FramebufferObject;
 
 class GraphicsContext : public EventHandler {
  public:
