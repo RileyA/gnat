@@ -16,6 +16,7 @@ FPSCamera::FPSCamera()
       pitch_max_(80.0 * 3.141592 / 180.0),
       yaw_min_(-80.0 * 3.141592 / 180.0),
       yaw_max_(80.0 * 3.141592 / 180.0),
+      yaw_limited_(false),
       sensitivity_x_(0.001),
       sensitivity_y_(0.001),
       speed_forward_(0.5),
@@ -55,6 +56,7 @@ void FPSCamera::SetPitchLimits(Real pitch_min, Real pitch_max) {
 void FPSCamera::SetYawLimits(Real yaw_min, Real yaw_max) {
   yaw_min_ = yaw_min * 3.141592 / 180.0;
   yaw_max_ = yaw_max * 3.141592 / 180.0;
+  yaw_limited_ = true;
 }
 //---------------------------------------------------------------------------
 
@@ -84,10 +86,10 @@ void FPSCamera::MouseMoved(const Message& m) {
   float yaw = sensitivity_x_ * -move.x;
   float pitch = sensitivity_y_ * -move.y;
 
-  if (current_yaw_ + yaw > yaw_max_) {
+  if (yaw_limited_ && current_yaw_ + yaw > yaw_max_) {
     yaw = yaw_max_ - current_yaw_;
     current_yaw_ = yaw_max_;
-  } else if (current_yaw_ + yaw < yaw_min_) {
+  } else if (yaw_limited_ && current_yaw_ + yaw < yaw_min_) {
     yaw = yaw_min_ - current_yaw_;
     current_yaw_ = yaw_min_;
   } else {

@@ -48,6 +48,7 @@ class FPSCamera : public EventHandler {
   Real current_yaw_;
   Real pitch_max_, pitch_min_;
   Real yaw_max_, yaw_min_;
+  bool yaw_limited_;
 
   Real sensitivity_x_, sensitivity_y_;
   Real speed_forward_, speed_strafe_;
