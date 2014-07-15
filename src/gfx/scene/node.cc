@@ -77,10 +77,12 @@ void Node::AddDrawable(Drawable* drawable) {
 void Node::RemoveDrawable(Drawable* drawable) {
   for (List<Drawable *>::iterator it = drawables_.begin();
        it != drawables_.end(); ++it) {
-    (*it)->SetParent(NULL);
-    drawables_.erase(it);
+    if (*it == drawable) {
+      (*it)->SetParent(NULL);
+      drawables_.erase(it);
+      return;
+    }
   }
-  drawables_.clear();
 }
 //---------------------------------------------------------------------------
 
@@ -117,7 +119,7 @@ void Node::SetOrientation(const Quaternion& orientation) {
 //---------------------------------------------------------------------------
 
 Matrix4 Node::GetTransform() {
-  //if (transform_dirty_)
+  if (transform_dirty_)
     ComputeTransform();
   return transform_;
 }

@@ -21,6 +21,7 @@ class FPSCamera : public EventHandler {
   void SetMouseSensitivity(Real x, Real y);
   void SetSpeed(Real forward, Real strafe);
   void SetPitchLimits(Real pitch_min, Real pitch_max);
+  void SetYawLimits(Real yaw_min, Real yaw_max);
 
   Vector3 GetDirection();
   Vector3 GetRight();
@@ -46,6 +47,8 @@ class FPSCamera : public EventHandler {
   Real current_pitch_;
   Real current_yaw_;
   Real pitch_max_, pitch_min_;
+  Real yaw_max_, yaw_min_;
+  bool yaw_limited_;
 
   Real sensitivity_x_, sensitivity_y_;
   Real speed_forward_, speed_strafe_;

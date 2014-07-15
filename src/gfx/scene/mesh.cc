@@ -48,7 +48,7 @@ void Mesh::Draw(Material* material) {
     Vector<std::pair<String, GLuint> >& attribs =
         program->GetVertexAttributes();
     for (int i = 0; i < attribs.size(); ++i) {
-      if (attributes_.count(attribs[i].first)) {
+      if (attributes_.count(attribs[i].first) && attribs[i].second != -1) {
         MeshData::Attribute attr = attributes_[attribs[i].first];
         glVertexAttribPointer(attribs[i].second, attr.size, attr.type, false,
                               stride_, BUFFER_OFFSET(attr.offset));
@@ -56,9 +56,18 @@ void Mesh::Draw(Material* material) {
       }
     }
   }
-
   glDrawElements(GL_TRIANGLES, num_indices_, GL_UNSIGNED_INT, (GLvoid*)0);
 
+  if (program) {
+    Vector<std::pair<String, GLuint> >& attribs =
+        program->GetVertexAttributes();
+    for (int i = 0; i < attribs.size(); ++i) {
+      if (attributes_.count(attribs[i].first) && attribs[i].second != -1) {
+        MeshData::Attribute attr = attributes_[attribs[i].first];
+        glDisableVertexAttribArray(attribs[i].second);
+      }
+    }
+  }
   ibo_.Unbind();
   vbo_.Unbind();
 }
@@ -84,7 +93,7 @@ void Mesh::UpdateFromMeshData(MeshData* data, bool verts, bool indices) {
     }
     num_indices_ = data->num_indices();
     unsigned char* buffer = static_cast<unsigned char*>(ibo_.MapBuffer());
-    memcpy(buffer, data->indices(), data->num_indices());
+    memcpy(buffer, data->indices(), data->num_indices() * sizeof(uint32_t));
     ibo_.UnmapBuffer();
   }
 }

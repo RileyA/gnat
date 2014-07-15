@@ -12,34 +12,58 @@ namespace gnat {
 Material::Material(String name)
   : name_(name),
     using_(false),
-    shader_program_(NULL) {}
+    shader_program_(NULL),
+    draw_group_(0),
+    depth_write_(true),
+    depth_func_(GL_LESS),
+    blend_src_(GL_ONE),
+    blend_dest_(GL_ONE) {}
 
 Material::~Material() {}
 
 void Material::Use() {
+  // For now push/pop everything
+  glPushAttrib(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_ENABLE_BIT |
+               GL_TEXTURE_BIT);
   if (shader_program_) {
     glUseProgram(shader_program_->handle());
   }
 
+  glDepthMask(depth_write_);
+  glDepthFunc(depth_func_);
+
+  if (depth_func_ == GL_ALWAYS)
+    glDisable(GL_DEPTH_TEST);
+  else
+    glEnable(GL_DEPTH_TEST);
+
+  if (blend_src_ != GL_ONE || blend_dest_ != GL_ONE) {
+    glEnable(GL_BLEND);
+    glBlendFunc(blend_src_, blend_dest_);
+  }
+
   GLenum idx = GL_TEXTURE0;
-  for (List<Texture *>::iterator it = textures_.begin(); it != textures_.end();
+  for (Map<String, Texture *>::iterator it = textures_.begin(); it != textures_.end();
        ++it)
-    (*it)->Bind(idx++);
+    it->second->Bind(idx++);
 }
 
 void Material::DoneUsing() {
   if (shader_program_) {
     glUseProgram(0);
   }
+  glPopAttrib();
 }
 
 void Material::AddTexture(Texture* texture, String uniform) {
-  if (!texture)
-    return;
-  textures_.push_back(texture);
+  textures_[uniform] = texture;
   if (shader_program_ && !uniform.empty()) {
     shader_program_->SetUniform1i(uniform, textures_.size() - 1);
   }
+}
+
+void Material::BindTexture(Texture* texture, String uniform) {
+  textures_[uniform] = texture;
 }
 
 // This is hacky, but I want a working format for Ludum Dare
@@ -139,16 +163,38 @@ Material* Material::FromFile(GraphicsContext* gfx, String filename) {
       }
     }
 
+    // general properties
+    if (j.Has("properties") && j["properties"].type() == JsonValue::kObject) {
+      JsonValue& p = j["properties"];
+      if (p.Has("blend_mode") && p["blend_mode"].type() == JsonValue::kString) {
+        m->SetBlendMode(p["blend_mode"].string());
+      }
+      if (p.Has("draw_group") && p["draw_group"].type() == JsonValue::kNumber) {
+        m->set_draw_group(p["draw_group"].integer());
+      }
+      if (p.Has("depth_write") &&
+          p["depth_write"].type() == JsonValue::kBoolean) {
+        m->set_depth_write(p["depth_write"]);
+      }
+      if (p.Has("depth_check") &&
+          p["depth_check"].type() == JsonValue::kString) {
+        m->SetDepthCheck(p["depth_check"].string());
+      }
+    }
+
     if (j.Has("textures") && j["textures"].type() == JsonValue::kArray) {
       for (int i = 0; i < j["textures"].size(); ++i) {
         JsonValue& t = j["textures"][i];
-        if (t.type() == JsonValue::kObject && t.Has("name")) {
+        if (t.type() == JsonValue::kObject) {
           bool alpha = t.Has("alpha") &&
                        t["alpha"].type() == JsonValue::kBoolean && t["alpha"];
           String uniform = "";
           if (t.Has("uniform") && t["uniform"].type() == JsonValue::kString)
             uniform = t["uniform"].string();
-          m->AddTexture(gfx->GetTexture(t["name"].string(), alpha), uniform);
+          if (t.Has("name"))
+            m->AddTexture(gfx->GetTexture(t["name"].string(), alpha), uniform);
+          else
+            m->AddTexture(0, uniform);
         }
       }
     }
@@ -157,6 +203,30 @@ Material* Material::FromFile(GraphicsContext* gfx, String filename) {
   }
 
   return m;
+}
+
+void Material::SetDepthCheck(String check) {
+  if (check == "always") {
+    depth_func_ = GL_ALWAYS;
+  } else if (check == "less_equal") {
+    depth_func_ = GL_LEQUAL;
+  } else if (check == "less") {
+    depth_func_ = GL_LESS;
+  } else {
+    printf("Unsupported depth func: %s\n", check.c_str());
+  }
+}
+
+void Material::SetBlendMode(String mode) {
+  if (mode == "normal") {
+    blend_src_ = GL_ONE;
+    blend_dest_ = GL_ZERO;
+  } else if (mode == "alpha") {
+    blend_src_ = GL_SRC_ALPHA;
+    blend_dest_ = GL_ONE_MINUS_SRC_ALPHA;
+  } else {
+    printf("Unsupported blend mode: %s\n", mode.c_str());
+  }
 }
 
 }  // namespace gnat
