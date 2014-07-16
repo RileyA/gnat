@@ -10,6 +10,9 @@ if(CMAKE_BUILD_TYPE MATCHES "[Dd][Ee][Bb][Uu][Gg]")
   add_definitions(-DDEBUG)
 endif()
 
+enable_language(ASM_NASM)
+set(CMAKE_ASM_NASM_COMPILER "yasm")
+
 include_directories(src)
 include_directories(/usr/local/include/SDL2)
 include_directories(src/third_party/gtest/include)
