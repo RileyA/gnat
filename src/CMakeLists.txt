@@ -73,6 +73,7 @@ set(GNAT_FILES
   platform/sdl/sdl_keycode_conversion.h
 
   third_party/FastDelegate/FastDelegate.h
+  third_party/x86inc/x86inc.asm
 
   util/color.h
   util/file_utils.cc
