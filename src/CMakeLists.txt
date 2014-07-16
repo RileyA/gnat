@@ -60,6 +60,9 @@ set(GNAT_FILES
   gfx/math/matrix4.h
   gfx/math/geometry/aabb.cc
   gfx/math/geometry/aabb.h
+  gfx/math/simd/util.h
+  gfx/math/simd/vector4_add.asm
+  gfx/math/simd/vector4_simd.h
 
   platform/gl_platform_context.h
   platform/input_platform_context.h
@@ -141,6 +144,7 @@ set(PERFTEST_FILES
   tests/test_main.cc
   
   gfx/math/vector3_perftest.cc
+  gfx/math/vector4_perftest.cc
 	)
 
 add_executable(gnat_perftests ${PERFTEST_FILES})
