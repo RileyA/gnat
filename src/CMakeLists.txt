@@ -88,19 +88,26 @@ set(GNAT_FILES
   util/scoped_ptr.h
   util/string_utils.cc
   util/string_utils.h
+  util/thread_pool.cc
+  util/thread_pool.h
   util/timer.cc
   util/timer.h
 	)
 
+set(Boost_USE_MULTITHREADED ON)
+find_package(Boost COMPONENTS thread date_time REQUIRED)
+
 find_package(OpenGL REQUIRED)
 find_package(PNG REQUIRED)
 
+include_directories(${Boost_INCLUDE_DIRS})
 include_directories(${PNG_INCLUDE_DIR})
 include_directories(${OPENGL_INCLUDE_DIR})
 
 add_library(gnat SHARED ${GNAT_FILES} )
 set_target_properties(gnat PROPERTIES LINKER_LANGUAGE CXX)
-target_link_libraries(gnat SDL2 GLEW ${OPENGL_LIBRARIES} ${PNG_LIBRARY})
+target_link_libraries(gnat SDL2 GLEW ${OPENGL_LIBRARIES} ${PNG_LIBRARY} 
+                      ${Boost_DATE_TIME_LIBRARY} ${Boost_THREAD_LIBRARY})
 
 install(TARGETS gnat
 	RUNTIME DESTINATION ${INSTALL_RUNTIMES_TO}
