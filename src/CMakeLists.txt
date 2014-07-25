@@ -42,6 +42,11 @@ set(GNAT_FILES
   gfx/scene/node.h
   gfx/scene/scene_manager.cc
   gfx/scene/scene_manager.h
+  gfx/scene/voxel/chunk.cc
+  gfx/scene/voxel/chunk.h
+  gfx/scene/voxel/chunk_traits.cc
+  gfx/scene/voxel/chunk_traits.h
+  gfx/scene/voxel/voxel.h
   gfx/util/buffer_object.cc
   gfx/util/buffer_object.h
   gfx/util/mesh_data.cc
@@ -95,7 +100,7 @@ set(GNAT_FILES
 	)
 
 set(Boost_USE_MULTITHREADED ON)
-find_package(Boost COMPONENTS thread date_time REQUIRED)
+find_package(Boost COMPONENTS thread date_time system REQUIRED)
 
 find_package(OpenGL REQUIRED)
 find_package(PNG REQUIRED)
@@ -107,7 +112,8 @@ include_directories(${OPENGL_INCLUDE_DIR})
 add_library(gnat SHARED ${GNAT_FILES} )
 set_target_properties(gnat PROPERTIES LINKER_LANGUAGE CXX)
 target_link_libraries(gnat SDL2 GLEW ${OPENGL_LIBRARIES} ${PNG_LIBRARY} 
-                      ${Boost_DATE_TIME_LIBRARY} ${Boost_THREAD_LIBRARY})
+                      ${Boost_THREAD_LIBRARY} ${Boost_DATE_TIME_LIBRARY}
+                      ${Boost_SYSTEM_LIBRARY})
 
 install(TARGETS gnat
 	RUNTIME DESTINATION ${INSTALL_RUNTIMES_TO}
@@ -134,6 +140,7 @@ set(TEST_FILES
   gfx/math/vector3_unittest.cc
   gfx/scene/node_unittest.cc
   gfx/scene/drawable_unittest.cc
+  gfx/scene/voxel/chunk_unittest.cc
 
   tests/test_main.cc
 
