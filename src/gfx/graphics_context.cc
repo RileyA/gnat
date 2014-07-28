@@ -57,8 +57,10 @@ void GraphicsContext::Update(Real delta) {
 }
 //---------------------------------------------------------------------------
 
-void GraphicsContext::RenderFrame(Camera *camera) {
-  scene_manager_.Draw(&root_, camera);
+void GraphicsContext::RenderFrame(Camera* camera, Node* root) {
+  if (!root)
+    root = &root_;
+  scene_manager_.Draw(root, camera);
 }
 //---------------------------------------------------------------------------
 
