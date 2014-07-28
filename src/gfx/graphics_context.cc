@@ -48,7 +48,7 @@ void GraphicsContext::Update(Real delta) {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
   // TODO listen for resized event from |platform_context_|
-  //glViewport(0, 0, platform_context_->width(), platform_context_->height());
+  glViewport(0, 0, platform_context_->width(), platform_context_->height());
 
   RenderFrame(camera_);
 
