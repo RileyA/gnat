@@ -193,7 +193,6 @@ Mesh* Mesh::LoadPLY(String filename) {
     file >> idx[2];
     d.AddTriangle(idx[0], idx[1], idx[2]);
   }
-
   return new Mesh(&d);
 }
 

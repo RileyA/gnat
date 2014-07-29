@@ -78,4 +78,12 @@ TEST(ChunkTest, CheckNeighbors2) {
             Traits::NEIGHBOR_BITS[5]);
 }
 
+TEST(ChunkTest, ApplyLots) {
+  StandardChunk* c = new StandardChunk();
+  c->SetVoxel(Coords(8,8,8), 1);
+  EXPECT_EQ(c->GetVoxel(Coords(8,8,8)).type, 0);
+  c->ApplyChanges();
+  EXPECT_EQ(c->GetVoxel(Coords(8,8,8)).type, 1);
+}
+
 }  // namespace gnat

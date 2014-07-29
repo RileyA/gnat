@@ -38,14 +38,15 @@ void MeshData::Start(size_t num_verts, size_t num_indices) {
     data_.reserve(num_verts * stride_);
   }
   if (num_indices != 0) {
-    indices_.resize(num_indices);
+    data_.resize(0);
+    indices_.reserve(num_indices);
   }
   started_ = true;
   current_vertex_ = 0;
 }
 //---------------------------------------------------------------------------
 
-void MeshData::AppendVertices(void* buf, size_t num_verts) {
+void MeshData::AppendVertices(const void* buf, size_t num_verts) {
   DCHECK(started_);
   AppendData(buf, num_verts_ * stride_);
 }
@@ -59,7 +60,7 @@ void MeshData::FinishVertex() {
 }
 //---------------------------------------------------------------------------
 
-void MeshData::AppendData(void* buffer, size_t size) {
+void MeshData::AppendData(const void* buffer, size_t size) {
   DCHECK(started_);
   size_t idx = data_.size();
   data_.resize(data_.size() + size);

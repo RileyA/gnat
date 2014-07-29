@@ -33,7 +33,7 @@ class MeshData {
 
   // Append interleaved data directly, it is assumed that it is formatted
   // correctly.
-  void AppendVertices(void* buf, size_t num_verts);
+  void AppendVertices(const void* buf, size_t num_verts);
 
   template<typename T> void Append(T* data) {
     AppendData(data, sizeof(T));
@@ -47,7 +47,7 @@ class MeshData {
 
   void FinishVertex();
 
-  void AppendData(void* buffer, size_t size);
+  void AppendData(const void* buffer, size_t size);
 
   // Get buffer.
   void* GetBuffer() { return &data_[0]; }

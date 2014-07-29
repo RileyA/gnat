@@ -9,6 +9,8 @@
 #include "gfx/scene/fps_camera.h"
 #include "gfx/scene/mesh_drawable.h"
 #include "gfx/scene/node.h"
+#include "gfx/scene/voxel/chunk_traits.h"
+#include "gfx/scene/voxel/chunk.h"
 #include "gfx/material/material.h"
 #include "gfx/material/program.h"
 #include "gfx/material/shader.h"
@@ -23,6 +25,10 @@
 #include "third_party/oyster/include/Oyster.h"
 
 using namespace gnat;
+
+typedef Chunk<STANDARD> StandardChunk;
+typedef ChunkTraits<STANDARD>::Coords Coords;
+typedef ChunkTraits<STANDARD> Traits;
 
 class TestState : public GameState {
  public:
@@ -56,39 +62,37 @@ class TestState : public GameState {
     Signal* tick = CreateSignal("tick");
     camera_->GetSlot("tick")->ListenTo(tick);
 
-    gfx_->oyster()->createAtlas("atlas", FileUtils::GetBaseFilePath() +
-                                             String("../data/gui/gui.oyster"));
-    om = new OysterMesh(gfx_->oyster(), "atlas", "batch");
-    MeshDrawable* ui = new MeshDrawable(om);
-    
-
-    Oyster::Batch* b = om->batch();
-
-    r = b->createLayer(1)->createRectangle(0, 0, 50, 50);
-    r->setSprite("cursor");
-
-    txt =
-        b->getLayer(1)->createText("FPS: 60", 100, 100, 500, 50, 255, 255, 255);
-
-    om->Update();
-    om->Update();
-
-
     Mesh* m = gfx_->GetMesh("../data/meshes/monkey_uv.ply");
     MeshDrawable* md = new MeshDrawable(m);
     Node* n = new Node();
     n->AddDrawable(md);
-    n->AddDrawable(ui);
 
     Material* mat = gfx_->GetMaterial("../data/materials/test.material");
-    Material* gui = gfx_->GetMaterial("../data/materials/gui.material");
+    Material* vox = gfx_->GetMaterial("../data/materials/voxel.material");
+
+    StandardChunk* c = new StandardChunk();
+    for (int i = 0; i < 100; ++i) {
+      int x = 1 + rand() % 14;
+      int y = 1 + rand() % 14;
+      int z = 1 + rand() % 14;
+      printf("%d %d %d\n", x, y, z);
+      c->SetVoxel(Coords(x, y, z), 1);
+    }
+    //c->SetVoxel(Coords(8,10,8), 1);
+    c->ApplyChanges();
+    c->GenerateMeshData();
+    c->UpdateMesh();
+    printf("valid? %d\n", c->NeighborsValid());
+    c->drawable()->SetMaterial(vox);
+    gfx_->GetRootNode()->AddChild(c);
+    c->SetPosition(Vector3(-8, -8, -8));
 
     md->SetMaterial(mat);
-    ui->SetMaterial(gui);
     gfx_->GetRootNode()->AddChild(n);
 
     n->SetPosition(Vector3(0, 0.5, 0));
     camera_->SetPosition(Vector3(0,0.5,2));
+    camera_->SetSpeed(2, 2);
     dl = 0.0;
   }
 
@@ -101,12 +105,6 @@ class TestState : public GameState {
   virtual void Update(double delta) {
     if (delta > 1.f) {
       delta = 0.f;
-    }
-    if (dl + delta > 1.f && dl <= 1.f) {
-      r->setSprite("text");
-      r->setPosition(50, 50);
-      om->batch()->getLayer(1)->createRectangle(0, 0, 50, 50)->setSprite("logo");
-      om->Update();
     }
     dl += delta;
     GetSignal("tick")->Send(delta);
