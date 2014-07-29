@@ -1,0 +1,25 @@
+{
+  "name" : "Test",
+  "program" : {
+    "vertex_program"   : "../data/materials/voxel_vs.glsl",
+    "fragment_program" : "../data/materials/voxel_fs.glsl",
+    "attributes" : [
+      "position",
+      "uv"
+    ],
+    "uniforms" : [
+      {
+        "name" : "mvp",
+        "type" : "auto",
+        "auto" : "MVP_MATRIX"
+      },
+    ],
+    "textures" : [
+      {
+        "name" : "../data/materials/voxel.png",
+        "alpha": false,
+        "uniform" : "diffuse"
+      }
+    ]
+  }
+}
