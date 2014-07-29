@@ -11,10 +11,15 @@ namespace gnat {
     static const unsigned char NEIGHBOR_BITS[6];
     static const unsigned char NEIGHBOR_BITS_OPPOSITE[6];
     static const unsigned char NEIGHBOR_VALID_BIT = 64;
+    static const unsigned char EMPTY_NEIGHBORS[64];
     static const float VOXEL_SCALE;
+    static const float VERTEX_POSITIONS[6][4][3];
     typedef unsigned char VoxelType;
     typedef unsigned char VoxelLight;
     static bool is_transparent(VoxelType type) {
+      return !type;
+    }
+    static bool is_nothing(VoxelType type) {
       return !type;
     }
   };

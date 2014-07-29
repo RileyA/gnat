@@ -1,12 +1,18 @@
 #include "gnat.h"
 
 #include "gfx/scene/voxel/chunk.h"
+#include "gfx/scene/mesh.h"
+#include "gfx/scene/mesh_drawable.h"
+#include "gfx/util/mesh_data.h"
 
 namespace gnat {
 
 template <ChunkType Type>
 Chunk<Type>::Chunk()
-  : changes_(new List<std::pair<Coords, VoxelType> >()),
+  : mesh_data_(0),
+    num_faces_(0),
+    mesh_(0),
+    changes_(new List<std::pair<Coords, VoxelType> >()),
     changes_applied_(new List<std::pair<Coords, VoxelType> >()) {
   memset(voxels_, 0, sizeof(voxels_));
   memset(neighbors_, 0, sizeof(neighbors_));
@@ -51,11 +57,20 @@ void Chunk<Type>::ApplyChanges() {
       // Update neighbors
       for (int i = 0; i < 6; ++i) {
         Voxel* v = get_voxel(c + Traits::NEIGHBOR_COORDS[i], this);
-        if (!v) {
+        if (!v)
           continue;
-        } else if (Traits::is_transparent(it->second)) {
+
+        if (Traits::is_transparent(it->second)) {
+          if (v->neighbors & Traits::NEIGHBOR_BITS_OPPOSITE[i] &&
+              !Traits::is_transparent(v->type)) {
+            ++num_faces_;
+          }
           v->neighbors &= ~Traits::NEIGHBOR_BITS_OPPOSITE[i];
         } else {
+          if (Traits::is_transparent(v->type))
+            ++num_faces_; // our block gains a face
+          else
+            --num_faces_; // their block loses a face
           v->neighbors |= Traits::NEIGHBOR_BITS_OPPOSITE[i];
         }
       }
@@ -77,12 +92,106 @@ void Chunk<Type>::ApplyChanges() {
 
 template <ChunkType Type>
 void Chunk<Type>::GenerateMeshData() {
+  MeshData* data = new MeshData();
 
+  // Generate some thangs
+  data->AddAttribute("position", 3, GL_FLOAT);
+  data->AddAttribute("uv", 2, GL_FLOAT);
+
+  printf("Num faces: %d\n", num_faces_);
+
+  data->Start(num_faces_ * 4, num_faces_ * 6);
+
+  int index = 0;
+  int vertex_index = 0;
+  for (int z = 0; z < 16; ++z) {
+    for (int y = 0; y < 16; ++y) {
+      for (int x = 0; x < 16; ++x) {
+        ++index;
+        if (voxels_[index].neighbors >= 63 ||
+            Traits::is_nothing(voxels_[index].type)) {
+          continue;
+        }
+        Vector3 base_pos(x + 0.5, y + 0.5, z + 0.5);
+        for (int i = 0; i < 6; ++i) {
+          if (!(voxels_[index].neighbors & Traits::NEIGHBOR_BITS[i])) {
+            float vertices[12];
+            float texcoords[4][2] = {
+              {0.f, 0.f},
+              {1.f, 0.f},
+              {0.f, 1.f},
+              {1.f, 1.f},
+            };
+
+            for (int j = 0; j < 4; ++j) {
+              memcpy(vertices, Traits::VERTEX_POSITIONS[i][j], sizeof(vertices));
+              for (int v = 0; v < 4; ++v) {
+                vertices[v * 3 + 0] += x;
+                vertices[v * 3 + 1] += y;
+                vertices[v * 3 + 2] += z;
+              }
+              data->AppendData(vertices, sizeof(float) * 3);
+              data->AppendData(texcoords[j], sizeof(float) * 2);
+            }
+            data->AddTriangle(vertex_index, vertex_index + 2, vertex_index + 3);
+            data->AddTriangle(vertex_index, vertex_index + 3, vertex_index + 1);
+            vertex_index += 4;
+          }
+        }
+      }
+    }
+  }
+
+  printf("Num verts: %d\n", vertex_index);
+
+  {
+    boost::mutex::scoped_lock lock(mesh_lock_);
+    delete mesh_data_;
+    mesh_data_ = data;
+  }
 }
 
 template <ChunkType Type>
 void Chunk<Type>::UpdateMesh() {
+  MeshData* data = 0;
 
+  {
+    boost::mutex::scoped_lock lock(mesh_lock_);
+    data = mesh_data_;
+    mesh_data_ = 0;
+  }
+
+  if (!mesh_) {
+    mesh_ = new Mesh(data);
+    drawable_ = new MeshDrawable(mesh_);
+    AddDrawable(drawable_);
+  } else {
+    DCHECK(drawable_);
+    mesh_->UpdateFromMeshData(data, true, true);
+  }
+
+  delete data;
+}
+
+template <ChunkType Type>
+bool Chunk<Type>::NeighborsValid() {
+  for (int i = 0; i < 16; ++i) {
+    for (int j = 0; j < 16; ++j) {
+      for (int k = 0; k < 16; ++k) {
+        Coords c(i, j, k);
+        Voxel* v = &voxels_[get_voxel_index(c)];
+        for (int l = 0; l < 6; ++l) {
+          Voxel* n = get_voxel(c + Traits::NEIGHBOR_COORDS[l], this);
+          if (!n)
+            continue;
+          if (Traits::is_transparent(n->type) == v->neighbors & Traits::NEIGHBOR_BITS[l]) {
+            return false;
+          }
+        }
+      }
+    }
+  }
+  return true;
 }
 
 template class Chunk<TERRAIN>;

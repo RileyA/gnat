@@ -53,6 +53,8 @@ class Node {
   void ComputeTransform();
   void SetParent(Node* n);
 
+  void InvalidateTransform();
+
   Vector3 position_;
   Quaternion orientation_;
 

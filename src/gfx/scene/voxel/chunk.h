@@ -12,6 +12,9 @@
 
 namespace gnat {
 
+class Mesh;
+class MeshDrawable;
+
 template <ChunkType Type>
 class Chunk : public Node {
  public:
@@ -48,28 +51,43 @@ class Chunk : public Node {
   // Generate mesh data.
   void GenerateMeshData();
 
-  // Apply mesh data to GPU.
+  // Apply mesh data to GPU. Should be called from main thread only (the one on
+  // which the OpenGL context is created and managed).
   void UpdateMesh();
+
+  MeshDrawable* drawable() { return drawable_; }
+
+  // For testing.
+  bool NeighborsValid();
 
  private:
 
-  // Protects mesh data.
-  boost::mutex lock_;
+  // For access from the chunk updater thread only.
+  Chunk<Type>* neighbors_[6];
 
-  // Mesh data.
-  MeshData mesh_data_;
+  // How many faces we need to build a mesh.
+  size_t num_faces_;
+
+  // For access from the main thread only.
+  MeshDrawable* drawable_;
+  Mesh* mesh_;
+
+  ///////////////////////////////////////////////////////////////////////////
 
   // Protects voxel data. Multi-reader, single writer.
   boost::shared_mutex voxel_lock_;
+  Voxel voxels_[Traits::SIZE_X * Traits::SIZE_Y * Traits::SIZE_Z];
+
+  // Protects mesh data.
+  boost::mutex mesh_lock_;
+  MeshData* mesh_data_;
 
   // Protects change data.
   boost::mutex change_lock_;
-
-  // List of mesh changes to be applied.
   List<std::pair<Coords, VoxelType> >* changes_;
-  
-  // List of mesh changes that have been applied.
   List<std::pair<Coords, VoxelType> >* changes_applied_;
+
+  ///////////////////////////////////////////////////////////////////////////
 
   static size_t get_voxel_index(Coords c) {
     return c.x + c.y * Traits::SIZE_X + c.z * Traits::SIZE_X * Traits::SIZE_Y;
@@ -90,10 +108,6 @@ class Chunk : public Node {
       return get_voxel(c - Coords(0, 0, Traits::SIZE_Z), chunk);
     return chunk->voxels_ + get_voxel_index(c);
   }
-
-  Chunk<Type>* neighbors_[6];
-
-  Voxel voxels_[Traits::SIZE_X * Traits::SIZE_Y * Traits::SIZE_Z];
 };
 
 }  // namespace gnat

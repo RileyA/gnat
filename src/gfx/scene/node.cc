@@ -9,7 +9,7 @@ Node::Node()
   : position_(Vector3::ZERO),
     orientation_(Quaternion::IDENTITY),
     transform_(Matrix4::IDENTITY),
-    transform_dirty_(false),
+    transform_dirty_(true),
     parent_(NULL) {}
 //---------------------------------------------------------------------------
 
@@ -107,14 +107,14 @@ int Node::GetNumChildren() {
 
 void Node::SetPosition(const Vector3& position) {
   position_ = position;
-  transform_dirty_ = true;
+  InvalidateTransform();
 }
 //---------------------------------------------------------------------------
 
 void Node::SetOrientation(const Quaternion& orientation) {
   orientation_ = orientation;
   // TODO see if a check for equality saves us much computation?
-  transform_dirty_ = true;
+  InvalidateTransform();
 }
 //---------------------------------------------------------------------------
 
@@ -142,9 +142,18 @@ void Node::ComputeTransform() {
     transform_ = parent_->GetTransform() * transform_;
   for (List<Node*>::iterator it = children_.begin(); it != children_.end();
        ++it) {
-    (*it)->transform_dirty_ = true;
+    (*it)->InvalidateTransform();
   }
   transform_dirty_ = false;
+}
+//---------------------------------------------------------------------------
+
+void Node::InvalidateTransform() {
+  transform_dirty_ = true;
+  for (List<Node*>::iterator it = children_.begin(); it != children_.end();
+       ++it) {
+    (*it)->InvalidateTransform();
+  }
 }
 //---------------------------------------------------------------------------
 

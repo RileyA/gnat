@@ -1,11 +1,10 @@
 {
-  "name" : "Test",
+  "name" : "Voxel",
   "program" : {
     "vertex_program"   : "../data/materials/vs.glsl",
     "fragment_program" : "../data/materials/fs.glsl",
     "attributes" : [
       "position",
-      "normal",
       "uv"
     ],
     "uniforms" : [
@@ -14,16 +13,6 @@
         "type" : "auto",
         "auto" : "MVP_MATRIX"
       },
-      {
-        "name"  : "brightness",
-        "type"  : "float",
-        "value" : 0.5
-      },
-      {
-        "name"  : "offset",
-        "type"  : "vec2",
-        "value" : [1.0, 0.0]
-      }
     ],
     "textures" : [
       {
