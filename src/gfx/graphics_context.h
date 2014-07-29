@@ -31,7 +31,7 @@ class GraphicsContext : public EventHandler {
   void Deinit();
 
   void Update(Real delta);
-  void RenderFrame(Camera* camera);
+  void RenderFrame(Camera* camera, Node* root = NULL);
 
   void SetClearColor(ColorF32 color);
 

@@ -48,7 +48,7 @@ void GraphicsContext::Update(Real delta) {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
   // TODO listen for resized event from |platform_context_|
-  //glViewport(0, 0, platform_context_->width(), platform_context_->height());
+  glViewport(0, 0, platform_context_->width(), platform_context_->height());
 
   RenderFrame(camera_);
 
@@ -57,8 +57,10 @@ void GraphicsContext::Update(Real delta) {
 }
 //---------------------------------------------------------------------------
 
-void GraphicsContext::RenderFrame(Camera *camera) {
-  scene_manager_.Draw(&root_, camera);
+void GraphicsContext::RenderFrame(Camera* camera, Node* root) {
+  if (!root)
+    root = &root_;
+  scene_manager_.Draw(root, camera);
 }
 //---------------------------------------------------------------------------
 
