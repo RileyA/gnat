@@ -12,8 +12,8 @@ Chunk<Type>::Chunk()
   : mesh_data_(0),
     num_faces_(0),
     mesh_(0),
-    changes_(new List<std::pair<Coords, VoxelType> >()),
-    changes_applied_(new List<std::pair<Coords, VoxelType> >()) {
+    changes_(new Map<Coords, VoxelType>()),
+    changes_applied_(new Map<Coords, VoxelType>()) {
   memset(voxels_, 0, sizeof(voxels_));
   memset(neighbors_, 0, sizeof(neighbors_));
 }
@@ -28,7 +28,7 @@ template <ChunkType Type>
 void Chunk<Type>::SetVoxel(Coords position, VoxelType type) {
   {
     boost::mutex::scoped_lock lock(change_lock_);
-    changes_->push_back(std::make_pair(position, type));
+    (*changes_)[position] = type;
   }
   // TODO: notify
 }
@@ -47,11 +47,13 @@ void Chunk<Type>::ApplyChanges() {
   }
 
   // First apply neighbor changes as necessary (also removes no-op changes).
-  for (typename List<std::pair<Coords, VoxelType> >::iterator it =
+  for (typename Map<Coords, VoxelType>::iterator it =
        changes_applied_->begin(); it != changes_applied_->end(); ++it) {
-    VoxelType t = voxels_[get_voxel_index(it->first)].type;
+    Voxel* current = &voxels_[get_voxel_index(it->first)];
+    VoxelType t = current->type;
+
     if (t == it->second) {
-      changes_applied_->erase(it); // no-op
+      continue; // no-op
     } else if (Traits::is_transparent(t) != Traits::is_transparent(it->second)) {
       Coords c = it->first;
       // Update neighbors
@@ -61,16 +63,23 @@ void Chunk<Type>::ApplyChanges() {
           continue;
 
         if (Traits::is_transparent(it->second)) {
-          if (v->neighbors & Traits::NEIGHBOR_BITS_OPPOSITE[i] &&
-              !Traits::is_transparent(v->type)) {
+          // If our neighbor is solid and we weren't but now are, they will
+          // need an additional face.
+          if (current->neighbors & Traits::NEIGHBOR_BITS[i] &&
+              !Traits::is_transparent(t)) {
             ++num_faces_;
           }
+          //if (v->neighbors & Traits::NEIGHBOR_BITS_OPPOSITE[i] &&
+          //    !Traits::is_transparent(v->type)) {
+          //  ++num_faces_;
+          //}
           v->neighbors &= ~Traits::NEIGHBOR_BITS_OPPOSITE[i];
         } else {
-          if (Traits::is_transparent(v->type))
-            ++num_faces_; // our block gains a face
-          else
+          // We are solid, neighbor is too
+          if (current->neighbors & Traits::NEIGHBOR_BITS[i])
             --num_faces_; // their block loses a face
+          else // we are solid neighbor is nothing
+            ++num_faces_; // our block gains a face
           v->neighbors |= Traits::NEIGHBOR_BITS_OPPOSITE[i];
         }
       }
@@ -83,7 +92,7 @@ void Chunk<Type>::ApplyChanges() {
     boost::upgrade_lock<boost::shared_mutex> lock(voxel_lock_); 
     boost::upgrade_to_unique_lock<boost::shared_mutex> uniqueLock(lock);
 
-    for (typename List<std::pair<Coords, VoxelType> >::iterator it =
+    for (typename Map<Coords, VoxelType>::iterator it =
          changes_applied_->begin(); it != changes_applied_->end(); ++it) {
       voxels_[get_voxel_index(it->first)].type = it->second;
     }

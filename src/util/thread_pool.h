@@ -7,6 +7,8 @@
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/condition_variable.hpp>
 
+#include <deque>
+
 namespace gnat {
 
 /** A simple and very limited interface that allows you to make a pool of threads

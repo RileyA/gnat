@@ -35,6 +35,7 @@ void GraphicsContext::Init() {
   oyster_ = new Oyster::Oyster(platform_context_->width(),
                                platform_context_->height());
   glEnable(GL_DEPTH_TEST);
+  glEnable(GL_CULL_FACE);
   glViewport(0, 0, platform_context_->width(), platform_context_->height());
 }
 //---------------------------------------------------------------------------
