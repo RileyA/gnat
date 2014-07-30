@@ -40,6 +40,10 @@ namespace gnat {
     ChunkCoords operator- (const ChunkCoords<T, U, V>& c) {
       return ChunkCoords(x - c.x, y - c.y, z - c.z);
     }
+
+    bool operator< (const ChunkCoords<T, U, V>& c) const {
+      return x < c.x || (x == c.x && (y < c.y || (y == c.y && (z < c.z))));
+    }
   };
 
   template<>

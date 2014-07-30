@@ -84,8 +84,8 @@ class Chunk : public Node {
 
   // Protects change data.
   boost::mutex change_lock_;
-  List<std::pair<Coords, VoxelType> >* changes_;
-  List<std::pair<Coords, VoxelType> >* changes_applied_;
+  Map<Coords, VoxelType>* changes_;
+  Map<Coords, VoxelType>* changes_applied_;
 
   ///////////////////////////////////////////////////////////////////////////
 
