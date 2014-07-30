@@ -49,16 +49,18 @@ void Chunk<Type>::ApplyChanges() {
   // First apply neighbor changes as necessary (also removes no-op changes).
   for (typename Map<Coords, VoxelType>::iterator it =
        changes_applied_->begin(); it != changes_applied_->end(); ++it) {
+
     Voxel* current = &voxels_[get_voxel_index(it->first)];
     VoxelType t = current->type;
 
     if (t == it->second) {
-      continue; // no-op
+      continue; // no-op TODO remove
     } else if (Traits::is_transparent(t) != Traits::is_transparent(it->second)) {
       Coords c = it->first;
       // Update neighbors
       for (int i = 0; i < 6; ++i) {
-        Voxel* v = get_voxel(c + Traits::NEIGHBOR_COORDS[i], this);
+        Chunk<Type>* n = this;
+        Voxel* v = get_voxel(c + Traits::NEIGHBOR_COORDS[i], &n);
         if (!v)
           continue;
 
@@ -67,19 +69,18 @@ void Chunk<Type>::ApplyChanges() {
           // need an additional face.
           if (current->neighbors & Traits::NEIGHBOR_BITS[i] &&
               !Traits::is_transparent(t)) {
-            ++num_faces_;
+            if (n)
+              ++n->num_faces_;
           }
-          //if (v->neighbors & Traits::NEIGHBOR_BITS_OPPOSITE[i] &&
-          //    !Traits::is_transparent(v->type)) {
-          //  ++num_faces_;
-          //}
           v->neighbors &= ~Traits::NEIGHBOR_BITS_OPPOSITE[i];
         } else {
           // We are solid, neighbor is too
-          if (current->neighbors & Traits::NEIGHBOR_BITS[i])
-            --num_faces_; // their block loses a face
-          else // we are solid neighbor is nothing
+          if (current->neighbors & Traits::NEIGHBOR_BITS[i]) {
+            if (n)
+              --n->num_faces_; // their block loses a face
+          } else { // we are solid neighbor is nothing
             ++num_faces_; // our block gains a face
+          }
           v->neighbors |= Traits::NEIGHBOR_BITS_OPPOSITE[i];
         }
       }
