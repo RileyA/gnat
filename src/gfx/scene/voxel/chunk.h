@@ -94,19 +94,46 @@ class Chunk : public Node {
   }
 
   static Voxel* get_voxel(Coords c, Chunk* chunk) {
+    if (!chunk)
+      return NULL;
     if (c.x < 0)
-      return get_voxel(c + Coords(Traits::SIZE_X, 0, 0), chunk);
-    else if (c.x > Traits::SIZE_X)
-      return get_voxel(c - Coords(Traits::SIZE_X, 0, 0), chunk);
+      return get_voxel(c + Coords(Traits::SIZE_X, 0, 0), chunk->neighbors_[1]);
+    else if (c.x >= Traits::SIZE_X)
+      return get_voxel(c - Coords(Traits::SIZE_X, 0, 0), chunk->neighbors_[0]);
     else if (c.y < 0)
-      return get_voxel(c + Coords(0, Traits::SIZE_Y, 0), chunk);
-    else if (c.y > Traits::SIZE_Y)
-      return get_voxel(c - Coords(0, Traits::SIZE_Y, 0), chunk);
+      return get_voxel(c + Coords(0, Traits::SIZE_Y, 0), chunk->neighbors_[3]);
+    else if (c.y >= Traits::SIZE_Y)
+      return get_voxel(c - Coords(0, Traits::SIZE_Y, 0), chunk->neighbors_[2]);
     else if (c.z < 0)
-      return get_voxel(c + Coords(0, 0, Traits::SIZE_Z), chunk);
-    else if (c.z > Traits::SIZE_Z)
-      return get_voxel(c - Coords(0, 0, Traits::SIZE_Z), chunk);
+      return get_voxel(c + Coords(0, 0, Traits::SIZE_Z), chunk->neighbors_[5]);
+    else if (c.z >= Traits::SIZE_Z)
+      return get_voxel(c - Coords(0, 0, Traits::SIZE_Z), chunk->neighbors_[4]);
     return chunk->voxels_ + get_voxel_index(c);
+  }
+
+  static Voxel* get_voxel(Coords c, Chunk** chunk) {
+    if (!(*chunk))
+      return NULL;
+    if (c.x < 0) {
+      *chunk = (*chunk)->neighbors_[1];
+      return get_voxel(c + Coords(Traits::SIZE_X, 0, 0), chunk);
+    } else if (c.x >= Traits::SIZE_X) {
+      *chunk = (*chunk)->neighbors_[0];
+      return get_voxel(c - Coords(Traits::SIZE_X, 0, 0), chunk);
+    } else if (c.y < 0) {
+      *chunk = (*chunk)->neighbors_[3];
+      return get_voxel(c + Coords(0, Traits::SIZE_Y, 0), chunk);
+    } else if (c.y >= Traits::SIZE_Y) { 
+      *chunk = (*chunk)->neighbors_[2];
+      return get_voxel(c - Coords(0, Traits::SIZE_Y, 0), chunk);
+    } else if (c.z < 0) {
+      *chunk = (*chunk)->neighbors_[5];
+      return get_voxel(c + Coords(0, 0, Traits::SIZE_Z), chunk);
+    } else if (c.z >= Traits::SIZE_Z) {
+      *chunk = (*chunk)->neighbors_[4];
+      return get_voxel(c - Coords(0, 0, Traits::SIZE_Z), chunk);
+    }
+    return (*chunk)->voxels_ + get_voxel_index(c);
   }
 };
 
