@@ -61,23 +61,27 @@ void Chunk<Type>::ApplyChanges() {
       for (int i = 0; i < 6; ++i) {
         Chunk<Type>* n = this;
         Voxel* v = get_voxel(c + Traits::NEIGHBOR_COORDS[i], &n);
-        if (!v)
+        if (!v) {
+          if (Traits::is_transparent(it->second) && !Traits::is_transparent(t)) {
+            --num_faces_;
+          } else if(!Traits::is_transparent(it->second) && Traits::is_transparent(t)) {
+            ++num_faces_;
+          }
           continue;
+        }
 
         if (Traits::is_transparent(it->second)) {
           // If our neighbor is solid and we weren't but now are, they will
           // need an additional face.
           if (current->neighbors & Traits::NEIGHBOR_BITS[i] &&
               !Traits::is_transparent(t)) {
-            if (n)
-              ++n->num_faces_;
+            ++n->num_faces_;
           }
           v->neighbors &= ~Traits::NEIGHBOR_BITS_OPPOSITE[i];
         } else {
           // We are solid, neighbor is too
-          if (current->neighbors & Traits::NEIGHBOR_BITS[i]) {
-            if (n)
-              --n->num_faces_; // their block loses a face
+          if (current->neighbors & Traits::NEIGHBOR_BITS[i] && n) {
+            --n->num_faces_; // their block loses a face
           } else { // we are solid neighbor is nothing
             ++num_faces_; // our block gains a face
           }
