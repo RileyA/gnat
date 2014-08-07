@@ -51,6 +51,7 @@ void GraphicsContext::Update(Real delta) {
   // TODO listen for resized event from |platform_context_|
   glViewport(0, 0, platform_context_->width(), platform_context_->height());
 
+  glBindFramebuffer(GL_FRAMEBUFFER, 0);
   RenderFrame(camera_);
 
   // Swap buffers/etc.
