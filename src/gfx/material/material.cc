@@ -122,7 +122,7 @@ Material* Material::FromFile(GraphicsContext* gfx, String filename) {
         // Auto set uniforms.
         if (type == "auto") {
           if (u.Has("auto"))
-            program->RegisterAutoUniform("mvp", u["auto"].string());
+            program->RegisterAutoUniform(name, u["auto"].string());
         } else {
           float tmpf[4];
           if (type == "int" && u.Has("value") &&

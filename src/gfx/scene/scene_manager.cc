@@ -54,7 +54,7 @@ void SceneManager::ConfigureMaterial(Material* material, Camera* camera) {
         break;
       case Program::VIEW_MATRIX:
         glUniformMatrix4fv(it->second, 1, false,
-                           &camera->GetViewMatrix().Transpose()[0][0]);
+                           &camera->GetViewMatrix()[0][0]);
         break;
       }
     }
