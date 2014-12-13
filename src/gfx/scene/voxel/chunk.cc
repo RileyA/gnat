@@ -27,7 +27,7 @@ Chunk<Type>::~Chunk() {
 template <ChunkType Type>
 void Chunk<Type>::SetVoxel(Coords position, VoxelType type) {
   {
-    boost::mutex::scoped_lock lock(change_lock_);
+    std::lock_guard<std::mutex> lock(change_lock_);
     (*changes_)[position] = type;
   }
   // TODO: notify
@@ -35,14 +35,14 @@ void Chunk<Type>::SetVoxel(Coords position, VoxelType type) {
 
 template <ChunkType Type>
 typename Chunk<Type>::Voxel Chunk<Type>::GetVoxel(Coords c) {
-  boost::shared_lock<boost::shared_mutex> lock(voxel_lock_);
+  std::lock_guard<std::mutex> lock(voxel_lock_);
   return *get_voxel(c, this);
 }
 
 template <ChunkType Type>
 void Chunk<Type>::ApplyChanges() {
   {
-    boost::mutex::scoped_lock lock(change_lock_);
+    std::lock_guard<std::mutex> lock(change_lock_);
     std::swap(changes_, changes_applied_);
   }
 
@@ -94,8 +94,7 @@ void Chunk<Type>::ApplyChanges() {
   // Grab lock and actually apply changes (we intentionally limit time spent
   // holding the lock).
   {
-    boost::upgrade_lock<boost::shared_mutex> lock(voxel_lock_); 
-    boost::upgrade_to_unique_lock<boost::shared_mutex> uniqueLock(lock);
+    std::lock_guard<std::mutex> lock(voxel_lock_); 
 
     for (typename Map<Coords, VoxelType>::iterator it =
          changes_applied_->begin(); it != changes_applied_->end(); ++it) {
@@ -159,7 +158,7 @@ void Chunk<Type>::GenerateMeshData() {
   printf("Num verts: %d\n", vertex_index);
 
   {
-    boost::mutex::scoped_lock lock(mesh_lock_);
+    std::lock_guard<std::mutex> lock(mesh_lock_);
     delete mesh_data_;
     mesh_data_ = data;
   }
@@ -170,7 +169,7 @@ void Chunk<Type>::UpdateMesh() {
   MeshData* data = 0;
 
   {
-    boost::mutex::scoped_lock lock(mesh_lock_);
+    std::lock_guard<std::mutex> lock(mesh_lock_);
     data = mesh_data_;
     mesh_data_ = 0;
   }

@@ -7,8 +7,7 @@
 #include "gfx/scene/voxel/chunk_traits.h"
 #include "gfx/util/mesh_data.h"
 
-#include <boost/thread/mutex.hpp>
-#include <boost/thread/shared_mutex.hpp>
+#include <mutex>
 
 namespace gnat {
 
@@ -75,15 +74,15 @@ class Chunk : public Node {
   ///////////////////////////////////////////////////////////////////////////
 
   // Protects voxel data. Multi-reader, single writer.
-  boost::shared_mutex voxel_lock_;
+  std::mutex voxel_lock_;
   Voxel voxels_[Traits::SIZE_X * Traits::SIZE_Y * Traits::SIZE_Z];
 
   // Protects mesh data.
-  boost::mutex mesh_lock_;
+  std::mutex mesh_lock_;
   MeshData* mesh_data_;
 
   // Protects change data.
-  boost::mutex change_lock_;
+  std::mutex change_lock_;
   Map<Coords, VoxelType>* changes_;
   Map<Coords, VoxelType>* changes_applied_;
 

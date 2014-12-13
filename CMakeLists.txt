@@ -10,6 +10,9 @@ if(CMAKE_BUILD_TYPE MATCHES "[Dd][Ee][Bb][Uu][Gg]")
   add_definitions(-DDEBUG)
 endif()
 
+# C++11
+list( APPEND CMAKE_CXX_FLAGS "-std=c++0x ${CMAKE_CXX_FLAGS} -g -ftest-coverage -fprofile-arcs")
+
 enable_language(ASM_NASM)
 set(CMAKE_ASM_NASM_COMPILER "yasm")
 

@@ -5,7 +5,7 @@ namespace gnat {
 ThreadPool::ThreadPool(int num_threads)
 	: num_threads_(num_threads) {
 	for(int i = 0; i < num_threads; ++i)
-		thread_pool_.add_thread(new boost::thread(&WorkerThread, this));
+		thread_pool_.push_back(new std::thread(&WorkerThread, this));
 	active_jobs_ = 0;
 	pending_jobs_ = 0;
 }
@@ -20,19 +20,22 @@ ThreadPool::~ThreadPool() {
 	StartWorkers();
 
 	//  let them all wrap up
-	thread_pool_.join_all();
+  for (int i = 0; i < thread_pool_.size(); ++i) {
+    thread_pool_[i]->join();
+    delete thread_pool_[i];
+  }
 }
 //---------------------------------------------------------------------------
 
 void ThreadPool::AddJob(Job* job) {
-	boost::mutex::scoped_lock lock(job_mutex_);
+	std::lock_guard<std::mutex> lock(job_mutex_);
 	jobs_.push_back(job);
 	++pending_jobs_;
 }
 //---------------------------------------------------------------------------
 
 void ThreadPool::StartWorkers() {
-	boost::mutex::scoped_lock lock(job_mutex_);
+	std::lock_guard<std::mutex> lock(job_mutex_);
 	// just notify one, it'll notify more if need be
 	if(!jobs_.empty())
 		job_signal_.notify_one();
@@ -41,9 +44,9 @@ void ThreadPool::StartWorkers() {
 
 void ThreadPool::WaitForWorkers() {
 	// wait for all current jobs to complete
-	boost::mutex::scoped_lock lock(job_mutex_);
+	std::lock_guard<std::mutex> lock(job_mutex_);
 	while(pending_jobs_ > 0)
-		job_done_signal_.wait(lock);
+		job_done_signal_.wait(job_mutex_);
 }
 //---------------------------------------------------------------------------
 
@@ -56,7 +59,7 @@ void ThreadPool::WorkerThread(ThreadPool* pool) {
 	while(true) {
 		// lock to access job queue
 		{
-      boost::mutex::scoped_lock lock(pool->job_mutex_);
+      std::lock_guard<std::mutex> lock(pool->job_mutex_);
 
 			// skip if this is the first iteration
 			if(has_job) {
@@ -78,7 +81,7 @@ void ThreadPool::WorkerThread(ThreadPool* pool) {
 			// loop on the condition, to handle spurious wakeups
 			// note that this will get skipped if jobs remain in the queue after being awoken
 			while(pool->jobs_.empty())
-				pool->job_signal_.wait(lock);
+				pool->job_signal_.wait(pool->job_mutex_);
 
 			// if it gets here, there must be a job for it...
 			assigned = pool->jobs_.front();

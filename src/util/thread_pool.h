@@ -3,11 +3,11 @@
 
 #include "gnat.h"
 
-#include <boost/thread/thread.hpp>
-#include <boost/thread/mutex.hpp>
-#include <boost/thread/condition_variable.hpp>
-
+#include <condition_variable>
 #include <deque>
+#include <mutex>
+#include <thread>
+#include <vector>
 
 namespace gnat {
 
@@ -44,7 +44,7 @@ class ThreadPool {
  protected:
 
 	// mutex that protects the job queue
-	boost::mutex job_mutex_;
+	std::mutex job_mutex_;
 
 	// the queue of pending jobs
 	std::deque<Job*> jobs_;
@@ -57,13 +57,13 @@ class ThreadPool {
 	unsigned int num_threads_;
 
 	// used to signal workers that there's work to be done
-	boost::condition_variable_any job_signal_;
+	std::condition_variable_any job_signal_;
 
 	// used to signal that the jobs are done
-	boost::condition_variable_any job_done_signal_;
+  std::condition_variable_any job_done_signal_;
 
 	// the pool of threads itself
-	boost::thread_group thread_pool_;
+  std::vector<std::thread*> thread_pool_;
 };
 
 }  // namespace gnat
