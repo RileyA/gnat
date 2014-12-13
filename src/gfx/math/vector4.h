@@ -7,7 +7,7 @@
 
 #include "gfx/math/simd/vector4_simd.h"
 
-#define USE_VECTOR4_SIMD
+//#define USE_VECTOR4_SIMD
 
 namespace gnat {
 

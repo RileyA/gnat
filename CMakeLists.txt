@@ -13,8 +13,8 @@ endif()
 # C++11
 list( APPEND CMAKE_CXX_FLAGS "-std=c++0x ${CMAKE_CXX_FLAGS} -g -ftest-coverage -fprofile-arcs")
 
-enable_language(ASM_NASM)
-set(CMAKE_ASM_NASM_COMPILER "yasm")
+#enable_language(ASM_NASM)
+#set(CMAKE_ASM_NASM_COMPILER "yasm")
 
 include_directories(src)
 include_directories(/usr/local/include/SDL2)
