@@ -58,42 +58,31 @@ class TestState : public GameState {
         ->AddListener(camera_->GetSlot("key_down"));
     game_->input()->GetSignal("mouse_move")
         ->AddListener(camera_->GetSlot("mouse_moved"));
-    gfx_->SetClearColor(ColorF32(1.0, 0.3, 0.2, 1.0));
+    game_->input()->GetKeyDownSignal(gnat::K_ESCAPE)
+        ->AddListener(game_->GetSlot("shutdown"));
     Signal* tick = CreateSignal("tick");
     camera_->GetSlot("tick")->ListenTo(tick);
 
-    Mesh* m = gfx_->GetMesh("../data/meshes/monkey_uv.ply");
-    MeshDrawable* md = new MeshDrawable(m);
-    Node* n = new Node();
-    n->AddDrawable(md);
+    gfx_->SetClearColor(ColorF32(0.12, 0.4, 0.85, 1.0));
 
-    Material* mat = gfx_->GetMaterial("../data/materials/test.material");
+    camera_->SetPosition(Vector3(0,0.5,2));
+    camera_->SetSpeed(2, 2);
+
     Material* vox = gfx_->GetMaterial("../data/materials/voxel.material");
 
     StandardChunk* c = new StandardChunk();
+    gfx_->GetRootNode()->AddChild(c);
     for (int i = 0; i < 100; ++i) {
       int x = 1 + rand() % 14;
       int y = 1 + rand() % 14;
       int z = 1 + rand() % 14;
-      printf("%d %d %d\n", x, y, z);
       c->SetVoxel(Coords(x, y, z), 1);
     }
-    //c->SetVoxel(Coords(8,10,8), 1);
     c->ApplyChanges();
     c->GenerateMeshData();
     c->UpdateMesh();
-    printf("valid? %d\n", c->NeighborsValid());
     c->drawable()->SetMaterial(vox);
-    gfx_->GetRootNode()->AddChild(c);
     c->SetPosition(Vector3(-8, -8, -8));
-
-    md->SetMaterial(mat);
-    gfx_->GetRootNode()->AddChild(n);
-
-    n->SetPosition(Vector3(0, 0.5, 0));
-    camera_->SetPosition(Vector3(0,0.5,2));
-    camera_->SetSpeed(2, 2);
-    dl = 0.0;
   }
 
   virtual void Deinit() {
@@ -106,17 +95,11 @@ class TestState : public GameState {
     if (delta > 1.f) {
       delta = 0.f;
     }
-    dl += delta;
     GetSignal("tick")->Send(delta);
     gfx_->Update(delta);
   }
 
  private:
-
-  OysterMesh* om;
-  Oyster::Rectangle* r;
-  Oyster::Text* txt;
-  float dl;
 
   FPSCamera* camera_;
   
