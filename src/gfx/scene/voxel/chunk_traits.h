@@ -49,7 +49,7 @@ namespace gnat {
   template<>
   struct ChunkTraits<TERRAIN> : public ChunkTraitsBase  {
     static const int SIZE_X = 16;
-    static const int SIZE_Y = 128;
+    static const int SIZE_Y = 127;
     static const int SIZE_Z = 16;
     typedef ChunkCoords<signed char, signed short, signed char> Coords;
     static const Coords NEIGHBOR_COORDS[6];

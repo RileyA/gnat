@@ -23,6 +23,7 @@ class ThreadPool {
   /** A single unit of work for a thread to do */
   class Job {
    public:
+    virtual ~Job() {}
     virtual void Execute() = 0;
   };
 

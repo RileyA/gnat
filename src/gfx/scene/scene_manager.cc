@@ -48,14 +48,16 @@ void SceneManager::ConfigureMaterial(Material* material, Camera* camera) {
     for (Map<Program::AutoUniformType, GLuint>::iterator it = uniforms.begin();
          it != uniforms.end(); ++it) {
       switch(it->first) {
-      case Program::PROJECTION_MATRIX:
-        glUniformMatrix4fv(it->second, 1, false,
-                           &camera->GetProjectionMatrix().Transpose()[0][0]);
-        break;
-      case Program::VIEW_MATRIX:
-        glUniformMatrix4fv(it->second, 1, false,
-                           &camera->GetViewMatrix()[0][0]);
-        break;
+        case Program::PROJECTION_MATRIX:
+          glUniformMatrix4fv(it->second, 1, false,
+                             &camera->GetProjectionMatrix().Transpose()[0][0]);
+          break;
+        case Program::VIEW_MATRIX:
+          glUniformMatrix4fv(it->second, 1, false,
+                             &camera->GetViewMatrix()[0][0]);
+          break;
+        default:
+          break;
       }
     }
   }
@@ -69,16 +71,18 @@ void SceneManager::ConfigureDrawable(Drawable* draw, Camera* camera) {
     for (Map<Program::AutoUniformType, GLuint>::iterator it = uniforms.begin();
          it != uniforms.end(); ++it) {
       switch(it->first) {
-      case Program::WORLD_MATRIX:
-        glUniformMatrix4fv(it->second, 1, false,
-                           &draw->GetParent()->GetTransform().Transpose()[0][0]);
-        break;
-      case Program::MVP_MATRIX:
-        glUniformMatrix4fv(
-            it->second, 1, false,
-            &(camera->GetProjectionMatrix() * camera->GetViewMatrix() *
-              draw->GetParent()->GetTransform()).Transpose()[0][0]);
-        break;
+        case Program::WORLD_MATRIX:
+          glUniformMatrix4fv(it->second, 1, false,
+                             &draw->GetParent()->GetTransform().Transpose()[0][0]);
+          break;
+        case Program::MVP_MATRIX:
+          glUniformMatrix4fv(
+              it->second, 1, false,
+              &(camera->GetProjectionMatrix() * camera->GetViewMatrix() *
+                draw->GetParent()->GetTransform()).Transpose()[0][0]);
+          break;
+        default:
+          break;
       }
     }
   }

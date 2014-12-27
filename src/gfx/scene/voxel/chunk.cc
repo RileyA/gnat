@@ -111,8 +111,6 @@ void Chunk<Type>::GenerateMeshData() {
   data->AddAttribute("position", 3, GL_FLOAT);
   data->AddAttribute("uv", 2, GL_FLOAT);
 
-  printf("Num faces: %d\n", num_faces_);
-
   data->Start(num_faces_ * 4, num_faces_ * 6);
 
   int index = 0;
@@ -197,7 +195,8 @@ bool Chunk<Type>::NeighborsValid() {
           Voxel* n = get_voxel(c + Traits::NEIGHBOR_COORDS[l], this);
           if (!n)
             continue;
-          if (Traits::is_transparent(n->type) == v->neighbors & Traits::NEIGHBOR_BITS[l]) {
+          if (Traits::is_transparent(n->type) ==
+              (v->neighbors & Traits::NEIGHBOR_BITS[l])) {
             return false;
           }
         }

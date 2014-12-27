@@ -45,8 +45,8 @@ class GraphicsContext : public EventHandler {
 
   Oyster::Oyster* oyster() { return oyster_; }
 
-  int width() { platform_context_->width(); }
-  int height() { platform_context_->height(); }
+  int width() { return platform_context_->width(); }
+  int height() { return platform_context_->height(); }
 
  private:
   

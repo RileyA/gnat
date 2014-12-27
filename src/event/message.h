@@ -32,11 +32,10 @@ const MessageAny<T>* message_any_cast(const Message& msg) {
 // This requires that |msg| has valid data.
 template<class T>
 T message_cast(const Message& msg) {
-  if(const MessageAny<T>* message =
-     dynamic_cast<const MessageAny<T>* >(&msg)) {
-    DCHECK(message);
-    return message->data;
-  }
+  const MessageAny<T>* message =
+     dynamic_cast<const MessageAny<T>* >(&msg)
+  DCHECK(message);
+  return message->data;
 }
 
 } // namespace gnat

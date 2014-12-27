@@ -15,7 +15,7 @@ AABB::AABB()
 //---------------------------------------------------------------------------
 
 // Expand to fit |point|.
-Vector3 AABB::expand(Vector3 point) {
+void AABB::expand(Vector3 point) {
   using std::min;
   using std::max;
   min_ = Vector3(min(min_.x, point.x),

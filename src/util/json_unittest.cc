@@ -4,12 +4,6 @@
 
 namespace gnat {
 
-  TEST(JsonTest, RemoveWhitespace) {
-    String str = "{ \"hello world\"\t\n\\\"  a  \\\" } ";
-    String expected = "{\"hello world\"\\\"a\\\"}";
-    EXPECT_EQ(expected, JsonValue::RemoveWhitespace(str));
-  }
-
   TEST(JsonTest, ReadString) {
     String str = "\"-\\\"-\"";
     const char* s = str.c_str();

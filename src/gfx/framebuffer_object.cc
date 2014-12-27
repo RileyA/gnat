@@ -90,6 +90,8 @@ FramebufferAttachable* FramebufferObject::Detach(GLenum point) {
     glFramebufferTexture2D(GL_FRAMEBUFFER, point, GL_TEXTURE_2D, 0, 0);
     return out;
   }
+  NOTREACHED();
+  return NULL;
 }
 //-------------------------------------------------------------------------
 

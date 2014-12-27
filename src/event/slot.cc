@@ -13,7 +13,7 @@ void Slot::ListenTo(Signal* signal, bool notify) {
 
 void Slot::StopListeningTo(Signal* signal, bool notify) {
   List<Signal*>::iterator it = signals_.begin();
-  for(it; it != signals_.end(); ++it) {
+  for(; it != signals_.end(); ++it) {
     if(signal == (*it)) {
       if(notify)
         (*it)->RemoveListener(this, false);
@@ -26,7 +26,7 @@ void Slot::StopListeningTo(Signal* signal, bool notify) {
 
 void Slot::StopAllListening() {
   List<Signal*>::iterator it = signals_.begin();
-  for(it; it != signals_.end(); ++it) {
+  for(; it != signals_.end(); ++it) {
     (*it)->RemoveListener(this, false);
   }
   signals_.clear();

@@ -13,7 +13,7 @@ class AABB {
   AABB();
 
   // Expand to fit |point|.
-  Vector3 expand(Vector3 point);
+  void expand(Vector3 point);
 
   Vector3 min() { return min_; }
   Vector3 max() { return max_; }

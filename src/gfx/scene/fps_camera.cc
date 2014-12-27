@@ -128,6 +128,8 @@ void FPSCamera::KeyDown(const Message& m) {
     case K_D:
       right_ = true;
       break;
+    default:
+      break;
   }
 }
 //---------------------------------------------------------------------------
@@ -145,6 +147,8 @@ void FPSCamera::KeyUp(const Message& m) {
       break;
     case K_D:
       right_ = false;
+      break;
+    default:
       break;
   }
 }

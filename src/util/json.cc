@@ -7,18 +7,55 @@
 
 namespace gnat {
 
-const char** safe_increment(const char** string) {
+// Increment, and throw an exception if we've read too far.
+void SafeIncrement(const char** string) {
   ++(*string);
   if (**string == '\0')
     throw std::exception();
 }
 //---------------------------------------------------------------------------
 
-void safe_match(String match, const char** string) {
+void SafeMatch(String match, const char** string) {
   for (int i = 0; i < match.size(); ++i) {
-    if (i != 0) safe_increment(string);
+    if (i != 0) SafeIncrement(string);
     if (match[i] != **string) throw std::exception();
   }
+}
+//---------------------------------------------------------------------------
+
+String RemoveWhitespace(String in) {
+  bool saw_quote = false;
+  String out = "";
+  for (int i = 0; i < in.size(); ++i) {
+    if (in[i] == '\\') {
+      out.push_back(in[i++]);
+      if (i == in.size())
+        break;
+      out.push_back(in[i]);
+      continue;
+    }
+    if (in[i] == '"')
+      saw_quote = !saw_quote;
+    if (!isspace(in[i]) || saw_quote)
+      out.push_back(in[i]);
+  }
+  return out;
+}
+//---------------------------------------------------------------------------
+
+String JsonValue::ReadString(const char** string) {
+  if (**string == '\0' || **string != '"') throw std::exception();
+  String out = "";
+  SafeIncrement(string);
+  while (**string != '"') {
+    if (**string == '\\') {
+      out.push_back(**string);
+      SafeIncrement(string);
+    }
+    out.push_back(**string);
+    SafeIncrement(string);
+  }
+  return out;
 }
 //---------------------------------------------------------------------------
 
@@ -142,20 +179,20 @@ JsonValue::JsonValue(Type type, const char** string) {
 
 void JsonValue::ParseObject(const char** string) {
   if (**string != '{') throw std::exception();
-  safe_increment(string);
+  SafeIncrement(string);
   while(**string != '}') {
     if (**string != '"') throw std::exception();
     String key = ReadString(string);
     if (**string != '"') throw std::exception();
-    safe_increment(string);
+    SafeIncrement(string);
     if (**string != ':') throw std::exception();
-    safe_increment(string);
+    SafeIncrement(string);
     JsonValue* value = ParseValue(string);
     if (!value) throw std::exception();
     entries_[key] = value;
-    safe_increment(string);
+    SafeIncrement(string);
     if (**string == ',')
-      safe_increment(string);
+      SafeIncrement(string);
   }
   if (**string != '}') throw std::exception();
 }
@@ -163,7 +200,7 @@ void JsonValue::ParseObject(const char** string) {
 
 void JsonValue::ParseArray(const char** string) {
   DCHECK(**string == '[');
-  safe_increment(string);
+  SafeIncrement(string);
   data_.a = kNull;
   while(**string != ']') {
     JsonValue* value = ParseValue(string);
@@ -174,9 +211,9 @@ void JsonValue::ParseArray(const char** string) {
     else if (value->type() != data_.a)
       throw std::exception();
     v.push_back(value);
-    safe_increment(string);
+    SafeIncrement(string);
     if (**string == ',')
-      safe_increment(string);
+      SafeIncrement(string);
   }
   if (**string != ']') throw std::exception();
 }
@@ -185,14 +222,14 @@ void JsonValue::ParseArray(const char** string) {
 void JsonValue::ParseBoolean(const char** string) {
   data_.b = (**string == 't');
   if (data_.b)
-    safe_match("true", string);
+    SafeMatch("true", string);
   else
-    safe_match("false", string);
+    SafeMatch("false", string);
 }
 //---------------------------------------------------------------------------
 
 void JsonValue::ParseNull(const char** string) {
-  safe_match("null", string);
+  SafeMatch("null", string);
 }
 //---------------------------------------------------------------------------
 
@@ -205,7 +242,7 @@ void JsonValue::ParseNumber(const char** string) {
   // TODO make this more robust
   data_.d = atof(*string);
   while(**string != ',' && **string != ']' && **string != '}')
-    safe_increment(string);
+    SafeIncrement(string);
   --(*string);
 }
 //---------------------------------------------------------------------------
@@ -224,8 +261,6 @@ JsonValue* JsonValue::ParseValue(const char** string) {
       value = new JsonValue(kString, string);
       break;
     case 'f':
-      value = new JsonValue(kBoolean, string);
-      break;
     case 't':
       value = new JsonValue(kBoolean, string);
       break;
@@ -243,41 +278,4 @@ JsonValue* JsonValue::ParseValue(const char** string) {
 }
 //---------------------------------------------------------------------------
 
-String JsonValue::RemoveWhitespace(String in) {
-  bool saw_quote = false;
-  String out = "";
-  for (int i = 0; i < in.size(); ++i) {
-    if (in[i] == '\\') {
-      out.push_back(in[i++]);
-      if (i == in.size())
-        break;
-      out.push_back(in[i]);
-      continue;
-    }
-    if (in[i] == '"')
-      saw_quote = !saw_quote;
-    if (!isspace(in[i]) || saw_quote)
-      out.push_back(in[i]);
-  }
-  return out;
-}
-//---------------------------------------------------------------------------
-
-String JsonValue::ReadString(const char** string) {
-  if (**string == '\0' || **string != '"') throw std::exception();
-  String out = "";
-  safe_increment(string);
-  while (**string != '"') {
-    if (**string == '\\') {
-      out.push_back(**string);
-      safe_increment(string);
-    }
-    out.push_back(**string);
-    safe_increment(string);
-  }
-  return out;
-}
-//---------------------------------------------------------------------------
-
-}
-
+}  // namespace gnat

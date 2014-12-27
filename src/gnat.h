@@ -37,16 +37,22 @@ template<typename K> class Set : public std::set<K> {};
 #define DCHECK(check);
 #endif
 
-#ifdef DEBUG
+#define CHECK(check) if (!(check)) \
+  {\
+    printf("Check fail: %s:%d\n", __FILE__, __LINE__); \
+    exit(1);                                         \
+  }
+
 #define NOTREACHED() {\
   printf("NOTREACHED: %s:%d\n", __FILE__, __LINE__); \
   exit(1);                                         \
   }
-#else
-#define NOTREACHED();
-#endif
 
-#define APPLICATION_NAME "GNAT_DEBUG"
+#ifdef DEBUG
+#define APPLICATION_NAME "GNAT (DEBUG)"
+#else
+#define APPLICATION_NAME "GNAT"
+#endif
 
 }  // namespace gnat
 

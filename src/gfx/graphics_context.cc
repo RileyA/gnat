@@ -82,6 +82,7 @@ Mesh* GraphicsContext::GetMesh(String filename) {
   Mesh* out = Mesh::Load(filename);
   if (out)
     return meshes_[filename] = out;
+  return NULL;
 }
 //---------------------------------------------------------------------------
 
@@ -91,6 +92,7 @@ Texture* GraphicsContext::GetTexture(String filename, bool alpha) {
   Texture* out = Texture::Load(filename, alpha);
   if (out)
     return textures_[filename] = out;
+  return NULL;
 }
 //---------------------------------------------------------------------------
 
@@ -100,6 +102,7 @@ Material* GraphicsContext::GetMaterial(String filename) {
   Material* out = Material::FromFile(this, filename);
   if (out)
     return materials_[filename] = out;
+  return NULL;
 }
 //---------------------------------------------------------------------------
 

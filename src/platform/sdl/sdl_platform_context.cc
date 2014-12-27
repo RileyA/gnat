@@ -67,7 +67,7 @@ void SDLPlatformContext::InitDisplay(size_t w, size_t h, bool fullscreen) {
   GLenum err = glewInit();
 
   if (err != GLEW_OK) {
-    printf("Glew Init Error: ", glewGetErrorString(err));
+    printf("Glew Init Error: %s", glewGetErrorString(err));
     exit(1);
   }
 

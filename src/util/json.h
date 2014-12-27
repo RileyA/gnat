@@ -7,6 +7,9 @@
 
 namespace gnat {
 
+// A simple and not-very-robust JSON parser. Parsing with Parse() returns
+// an instance of this object, and you can reach any child values that it
+// may have through the getters below.
 class JsonValue {
  public:
   enum Type {
@@ -22,14 +25,26 @@ class JsonValue {
 
   ~JsonValue();
 
+  /////////////////////////////////////////////////////////////////////
+  // Functions for arrays and/or objects, calling with something that
+  // isn't an array or object is undefined.
+
+  // If we're an array, get whether we have an index.
   bool Has(int idx);
+
+  // If we're an object, get whether we have a given key.
   bool Has(const char* key);
 
   // Bracket getters for objects/arrays.
   JsonValue& operator[](int idx);
   JsonValue& operator[](String key);
   JsonValue& operator[](const char* key);
+
+  // Length of array or object.
   size_t size();
+
+  /////////////////////////////////////////////////////////////////////
+  // Primitive getters
 
   // Implicit conversion operators.
   operator bool() const;
@@ -52,7 +67,8 @@ class JsonValue {
     return data_.d;
   }
 
-  static String RemoveWhitespace(String in);
+  /////////////////////////////////////////////////////////////////////
+
   static String ReadString(const char** string);
 
  private:
